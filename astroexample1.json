@@ -1,0 +1,135 @@
+{ "SSA22Field": 
+    [
+        {
+        "type": "AGN",
+        "image":"none",
+        "parameterArray": [
+            {"id": "1"},
+            {"ra": "334.15"},
+            {"dec": "2.51"},
+            {"hflux": "6.19e-15"},
+            {"sflux": "1.97e-15"},
+            {"z": "1.71"},
+            {"rmag": "25.34"}
+        ]
+        },
+        {
+        "type": "STF",
+        "image":"none",
+        "parameterArray": [
+            {"id": "2"},
+            {"ra": "333.17"},
+            {"dec": "2.20"},
+            {"hflux": "4.19e-15"},
+            {"sflux": "2.92e-15"},
+            {"z": "1.90"},
+            {"rmag": "25.74"}
+        ]
+        }, 
+        {
+        "type": "DWARF",
+        "image":"none",
+        "parameterArray": [
+            {"id": "3"},
+            {"ra": "334.05"},
+            {"dec": "2.73"},
+            {"hflux": "5.24e-15"},
+            {"sflux": "0.92e-15"},
+            {"z": "2.12"},
+            {"rmag": "26.00"}
+        ]
+        },
+        , 
+        {
+        "type": "AGN",
+        "image":"none",
+        "parameterArray": [
+            {"id": "4"},
+            {"ra": "334.22"},
+            {"dec": "2.55"},
+            {"hflux": "7.34e-15"},
+            {"sflux": "3.58e-15"},
+            {"z": "1.29"},
+            {"rmag": "24.59"}
+        ]
+        },
+        {
+        "type": "AGN",
+        "image":"none",
+        "parameterArray": [
+            {"id": "5"},
+            {"ra": "333.48"},
+            {"dec": "2.04"},
+            {"hflux": "7.59e-14"},
+            {"sflux": "9.96e-15"},
+            {"z": "1.08"},
+            {"rmag": "25.25"}
+        ]
+        },
+        {
+        "type": "STF",
+        "image":"none",
+        "parameterArray": [
+            {"id": "6"},
+            {"ra": "334.27"},
+            {"dec": "2.53"},
+            {"hflux": "3.24e-15"},
+            {"sflux": "1.10e-15"},
+            {"z": "3.24"},
+            {"rmag": "26.27"}
+        ]
+        },
+        {
+        "type": "STF",
+        "image":"none",
+        "parameterArray": [
+            {"id": "7"},
+            {"ra": "334.09"},
+            {"dec": "2.31"},
+            {"hflux": "1.88e-15"},
+            {"sflux": "8.54e-16"},
+            {"z": "3.97"},
+            {"rmag": "26.74"}
+        ]
+        },
+        {
+        "type": "STAR",
+        "image":"none",
+        "parameterArray": [
+            {"id": "8"},
+            {"ra": "333.94"},
+            {"dec": "2.40"},
+            {"hflux": "8.64e-15"},
+            {"sflux": "2.38e-15"},
+            {"z": "0.15"},
+            {"rmag": "25.91"}
+        ]
+        },
+        {
+        "type": "AGN",
+        "image":"none",
+        "parameterArray": [
+            {"id": "9"},
+            {"ra": "334.80"},
+            {"dec": "2.47"},
+            {"hflux": "5.54e-14"},
+            {"sflux": "8.65e-15"},
+            {"z": "1.92"},
+            {"rmag": "25.89"}
+        ]
+        },
+        {
+        "type": "STF",
+        "image":"none",
+        "parameterArray": [
+            {"id": "10"},
+            {"ra": "334.22"},
+            {"dec": "2.13"},
+            {"hflux": "1.21e-16"},
+            {"sflux": "0.83e-16"},
+            {"z": "4.08"},
+            {"rmag": "26.95"}
+        ]
+        }
+     ]    
+}
