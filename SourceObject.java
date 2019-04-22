@@ -21,6 +21,17 @@ public class SourceObject {
   // RMAG, unitless
   final double RMAG;
 
+  /**
+   * Constructor initializes parameters of the given source, in cgs units
+   * 
+   * @param id the ID of the object
+   * @param ra the RA coordinates of the object
+   * @param dec the DEC coordinates of the object
+   * @param hard_flux the hard-band flux of the object
+   * @param soft_flux the soft-band flux of the object
+   * @param z the redshift of the object
+   * @param rmag the R-band magnitude of the object
+   */
   public SourceObject(int id, double ra, double dec, double hard_flux, double soft_flux, double z,
       double rmag) {
     this.ID = id;
@@ -32,14 +43,16 @@ public class SourceObject {
     this.RMAG = rmag;
 
   }
-/**
- * Given the redshift of the source, returns its distance in cm
- * @return the distance of the object, in cm
- */
-public double getDistance() {
-  return 1.303*Math.pow(10, 28)*Z;
 
-}
+  /**
+   * Given the redshift of the source, returns its distance in cm
+   * 
+   * @return the distance of the object, in cm
+   */
+  public double getDistance() {
+    return 1.303 * Math.pow(10, 28) * Z;
+
+  }
 
 
 }
