@@ -1,69 +1,70 @@
 package application;
 	
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import java.io.File;
+
 import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 
 public class Main extends Application {
-  public static void parseJSON(String filepath) throws IOException, ParseException {
-    // astroexample1
-    FileReader f = new FileReader(filepath);
-   // first, parse JSON file given the file path
-       Object obj = new JSONParser().parse(f);
-       // then create a JSON Object to represent file
-       JSONObject jo = (JSONObject) obj;
-       // create JSONArray to represent vertices from JSON file
-       JSONArray packages = (JSONArray) jo.get("SSA22Field");
-      // SSA22_Field
-       // iterate though all vertices (packages)
-       for (int i = 0; i < packages.size(); i++) {
-         // create JSONObject to hold given package
-         JSONObject jsonPackage = (JSONObject) packages.get(i);
-         // look for/ save the name info for given package (vertex name)
-         String name = (String) jsonPackage.get("type");
-         // create a JSONArray object to store the dependencies of the given package
-         // this is the same as the edges of this given vertex
-         JSONArray array = (JSONArray) jsonPackage.get("parameterArray");
-         // create a String[] array large enough to store these dependencies
-         String[] dependencies = new String[array.size()];
-       
-    // iterate through the JSON array
-         for (int j = 0; j < array.size(); j++) {
-           // copy the package/ vertex names into String[] array
-           dependencies[j] = (String) array.get(j).toString();
-           System.out.println(dependencies[j]);
-         }
-       }
-  }
 	@Override
 	public void start(Stage primaryStage) {
 		try {
 			BorderPane mainMenu = new BorderPane();
-			Button powerButton = new Button();
+			
+			Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
+		    mainMenu.setBackground(new Background(new BackgroundImage(bg,
+		            BackgroundRepeat.NO_REPEAT,
+		            BackgroundRepeat.NO_REPEAT,
+		            BackgroundPosition.CENTER,
+		            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
+			Image power = new Image("file:Power.png");
+			ImageView powerView = new ImageView(power);
+			powerView.setFitHeight(40);
+			powerView.setFitWidth(40);
+			Button powerButton = new Button(null, powerView);
 			mainMenu.setRight(powerButton);
 			Text title = new Text("Astronomical Catalog Data Receiver");
+			title.setFont(Font.font(40));
+			title.setFill(Color.WHITE);
 			TextFlow titleBox = new TextFlow(title);
-			
+			titleBox.setTextAlignment(TextAlignment.CENTER);
 			mainMenu.setTop(titleBox);
-			TextArea filePath = new TextArea();
-			mainMenu.setCenter(filePath);
-			Button readFile = new Button();
+			FileChooser chooser = new FileChooser();
+			Button fileChooser = new Button("Select File");
+			fileChooser.setFont(Font.font(20));
+			fileChooser.setOnAction(e -> {
+				File selectedFile = chooser.showOpenDialog(primaryStage);
+			});
+			mainMenu.setCenter(fileChooser);
+			Button recentFile = new Button("Read most recent file");
+			recentFile.setFont(Font.font(20));
+			Button recentID = new Button("Read all data from most recent ID");
+			recentID.setFont(Font.font(20));
+			VBox bottomRight = new VBox(recentFile, recentID);
+			bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+			mainMenu.setBottom(bottomRight);
 			
-			Scene scene1 = new Scene(mainMenu,1280,720);
+			Scene scene1 = new Scene(mainMenu,780,800);
 			scene1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			
 			
@@ -90,10 +91,7 @@ public class Main extends Application {
 		}
 	}
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException, ParseException {
-	  String filepath = "astroexample1.json";
-	 parseJSON(filepath);
-	    
+	public static void main(String[] args) {
 		launch(args);
 	}
 }
