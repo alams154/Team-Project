@@ -1,5 +1,3 @@
-package application;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,7 +13,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -24,9 +24,11 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -35,6 +37,8 @@ import javafx.scene.text.TextFlow;
 public class Main extends Application {
   private static Hashtable<Integer, SourceObject> h;
 
+  
+  
   /**
    * @param filepath
    * @throws IOException
@@ -205,6 +209,21 @@ public class Main extends Application {
       e.printStackTrace();
     }
   }
+  
+  private void idParameters(BorderPane pane) {
+	  
+  }
+  
+  private void idLookUp(BorderPane pane) {
+	    TextField enterID = new TextField();
+	    enterID.setPromptText("Enter ID");
+	    Label label1 = new Label("ID: ");
+	    label1.setTextFill(Color.WHITE);
+	    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
+	    HBox hb = new HBox(label1, enterID);
+	    hb.setAlignment(Pos.TOP_RIGHT);
+	    pane.setRight(hb);
+}
 
   public static void main(String[] args) throws FileNotFoundException, IOException, ParseException,
       org.json.simple.parser.ParseException {
