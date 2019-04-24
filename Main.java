@@ -221,13 +221,11 @@ public class Main extends Application {
 
   
   private void inputRightPane(BorderPane pane) {
-	  	TextField enterID = new TextField();
+	    TextField enterID = new TextField();
 	    enterID.setPromptText("Enter ID");
-	    
 	    Label label1 = new Label("Search ID: ");
 	    label1.setTextFill(Color.WHITE);
 	    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
-	    
 	    HBox hb = new HBox(label1, enterID);
 	    hb.setAlignment(Pos.BOTTOM_RIGHT);
 
@@ -250,6 +248,9 @@ public class Main extends Application {
 	    CheckBox rmag = new CheckBox("R-Band Magnitude");
 	    rmag.setTextFill(Color.WHITE);
 	    rmag.setFont(Font.font("Helvetica", 24));
+	    CheckBox all = new CheckBox("All");
+	    all.setTextFill(Color.WHITE);
+	    all.setFont(Font.font("Helvetica", 24));
 	    
 	    VBox first = new VBox(ra, dec, hflux);
 	    first.setSpacing(100);
@@ -258,13 +259,14 @@ public class Main extends Application {
 	    HBox boxes = new HBox(first, sec);
 	    boxes.setSpacing(30);
 	    
-	    VBox moreboxes = new VBox(hb, boxes);
-	    moreboxes.setSpacing(150);
+	    VBox moreboxes = new VBox(hb, boxes, all);
+	    moreboxes.setSpacing(100);
 	    moreboxes.setTranslateX(-20);
 	    moreboxes.setTranslateY(10);
+	    moreboxes.setAlignment(Pos.TOP_CENTER);
 	    pane.setRight(moreboxes);
 	    
-	    //bottom buttons
+	    //bottom buttons    
 	    Button addSource = new Button("Add Source");
 	    addSource.setFont(Font.font("Helvetica", 18));
 	    Button display = new Button("Display");
