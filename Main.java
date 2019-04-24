@@ -31,6 +31,7 @@ public class Main extends Application {
 		try {
 			BorderPane mainMenu = new BorderPane();
 			
+			// Layout Setup
 			Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
 		    mainMenu.setBackground(new Background(new BackgroundImage(bg,
 		            BackgroundRepeat.NO_REPEAT,
@@ -49,12 +50,8 @@ public class Main extends Application {
 			TextFlow titleBox = new TextFlow(title);
 			titleBox.setTextAlignment(TextAlignment.CENTER);
 			mainMenu.setTop(titleBox);
-			FileChooser chooser = new FileChooser();
 			Button fileChooser = new Button("Select File");
 			fileChooser.setFont(Font.font(20));
-			fileChooser.setOnAction(e -> {
-				File selectedFile = chooser.showOpenDialog(primaryStage);
-			});
 			mainMenu.setCenter(fileChooser);
 			Button recentFile = new Button("Read most recent file");
 			recentFile.setFont(Font.font(20));
@@ -69,6 +66,10 @@ public class Main extends Application {
 			
 			
 			BorderPane input = new BorderPane();
+			
+			// Layout Setup
+			
+			
 			Scene scene2 = new Scene(input,1280,720);
 			scene2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			
@@ -79,6 +80,23 @@ public class Main extends Application {
 			BorderPane exit = new BorderPane();
 			Scene scene4 = new Scene(exit,1280,720);
 			scene4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			
+			// Action Setup
+			FileChooser chooser = new FileChooser();
+			fileChooser.setOnAction(e -> {
+				File selectedFile = chooser.showOpenDialog(primaryStage);
+			});
+			recentFile.setOnAction(e -> {
+				primaryStage.setScene(scene3);
+			});
+			recentID.setOnAction(e -> {
+				primaryStage.setScene(scene3);
+			});
+			powerButton.setOnAction(e -> {
+				primaryStage.setScene(scene4);
+			});
+			
+			// Action Setup
 			
 			primaryStage.setScene(scene1);
 			primaryStage.show();
