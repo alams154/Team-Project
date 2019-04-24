@@ -12,7 +12,10 @@ import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -38,6 +41,92 @@ public class Main extends Application {
   private static Hashtable<Integer, SourceObject> h;
 
   
+  private Scene screen1Setup(Stage primaryStage, Scene scene1, Scene scene2, Scene scene3, Scene scene4) {
+		BorderPane mainMenu = new BorderPane();
+		
+		Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
+		mainMenu.setBackground(new Background(new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT,
+				BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
+				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
+		Image power = new Image("file:Power.png");
+		ImageView powerView = new ImageView(power);
+		powerView.setFitHeight(40);
+		powerView.setFitWidth(40);
+		Button powerButton = new Button(null, powerView);
+		mainMenu.setRight(powerButton);
+		Text title = new Text("Astronomical Catalog Data Receiver");
+		title.setFont(Font.font(40));
+		title.setFill(Color.WHITE);
+		TextFlow titleBox = new TextFlow(title);
+		titleBox.setTextAlignment(TextAlignment.CENTER);
+		mainMenu.setTop(titleBox);
+		Button fileChooser = new Button("Select File");
+		fileChooser.setFont(Font.font(20));
+		mainMenu.setCenter(fileChooser);
+		Button recentFile = new Button("Read most recent file");
+		recentFile.setFont(Font.font(20));
+		Button recentID = new Button("Read all data from most recent ID");
+		recentID.setFont(Font.font(20));
+		VBox bottomRight = new VBox(recentFile, recentID);
+		bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+		mainMenu.setBottom(bottomRight);
+		
+		FileChooser chooser = new FileChooser();
+		fileChooser.setOnAction(e -> {
+			File selectedFile = chooser.showOpenDialog(primaryStage);
+			if(selectedFile.getName().substring(selectedFile.getName().length() - 5, selectedFile.getName().length()).equals(".json")) {
+				primaryStage.setScene(scene2);
+			}
+			else {
+				Alert invalidFile = new Alert (Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
+				invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+			}
+		});
+		recentFile.setOnAction(e -> {
+			primaryStage.setScene(scene3);
+		});
+		recentID.setOnAction(e -> {
+			primaryStage.setScene(scene3);
+		});
+		powerButton.setOnAction(e -> {
+			primaryStage.setScene(scene4);
+		});
+		
+		return new Scene(mainMenu, 780, 800);
+	}
+
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+			Scene scene1 = new Scene(new BorderPane());
+			
+			// Layout Setup
+			BorderPane input = new BorderPane();
+			Scene scene2 = new Scene(input, 1280, 720);
+			scene2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+			BorderPane results = new BorderPane();
+			Scene scene3 = new Scene(results, 1280, 720);
+			scene3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+			BorderPane exit = new BorderPane();
+			Scene scene4 = new Scene(exit, 1280, 720);
+			scene4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			
+			scene1 = screen1Setup(primaryStage, scene1, scene2, scene3, scene4);
+			// Layout Setup
+
+			scene1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+
+
+			primaryStage.setScene(scene1);
+			primaryStage.show();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
   
   /**
    * @param filepath
@@ -130,103 +219,53 @@ public class Main extends Application {
     }
   }
 
-  @Override
-  public void start(Stage primaryStage) {
-    try {
-      BorderPane mainMenu = new BorderPane();
-
-      // Layout Setup
-      Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
-      mainMenu.setBackground(new Background(new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT,
-          BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(
-              BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
-      Image power = new Image("file:Power.png");
-      ImageView powerView = new ImageView(power);
-      powerView.setFitHeight(40);
-      powerView.setFitWidth(40);
-      Button powerButton = new Button(null, powerView);
-      mainMenu.setRight(powerButton);
-      Text title = new Text("Astronomical Catalog Data Receiver");
-      title.setFont(Font.font(40));
-      title.setFill(Color.WHITE);
-      TextFlow titleBox = new TextFlow(title);
-      titleBox.setTextAlignment(TextAlignment.CENTER);
-      mainMenu.setTop(titleBox);
-      Button fileChooser = new Button("Select File");
-      fileChooser.setFont(Font.font(20));
-      mainMenu.setCenter(fileChooser);
-      Button recentFile = new Button("Read most recent file");
-      recentFile.setFont(Font.font(20));
-      Button recentID = new Button("Read all data from most recent ID");
-      recentID.setFont(Font.font(20));
-      VBox bottomRight = new VBox(recentFile, recentID);
-      bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
-      mainMenu.setBottom(bottomRight);
-
-      Scene scene1 = new Scene(mainMenu, 780, 800);
-      scene1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-
-      BorderPane input = new BorderPane();
-
-      // Layout Setup
-
-
-      Scene scene2 = new Scene(input, 1280, 720);
-      scene2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-      BorderPane results = new BorderPane();
-      Scene scene3 = new Scene(results, 1280, 720);
-      scene3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-      BorderPane exit = new BorderPane();
-      Scene scene4 = new Scene(exit, 1280, 720);
-      scene4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-      // Action Setup
-      FileChooser chooser = new FileChooser();
-      fileChooser.setOnAction(e -> {
-        File selectedFile = chooser.showOpenDialog(primaryStage);
-      });
-      recentFile.setOnAction(e -> {
-        primaryStage.setScene(scene3);
-      });
-      recentID.setOnAction(e -> {
-        primaryStage.setScene(scene3);
-      });
-      powerButton.setOnAction(e -> {
-        primaryStage.setScene(scene4);
-      });
-
-      // Action Setup
-
-      primaryStage.setScene(scene1);
-      primaryStage.show();
-
-
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
   
-  private void idParameters(BorderPane pane) {
-	  
-  }
-  
-  private void idLookUp(BorderPane pane) {
-	    TextField enterID = new TextField();
+  private void inputRightPane(BorderPane pane) {
+	  	TextField enterID = new TextField();
 	    enterID.setPromptText("Enter ID");
-	    Label label1 = new Label("ID: ");
+	    
+	    Label label1 = new Label("Search ID: ");
 	    label1.setTextFill(Color.WHITE);
 	    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
+	    
 	    HBox hb = new HBox(label1, enterID);
 	    hb.setAlignment(Pos.TOP_RIGHT);
-	    pane.setRight(hb);
+
+	    
+		CheckBox ra = new CheckBox("Right Ascension");
+		ra.setTextFill(Color.WHITE);
+		ra.setFont(Font.font("Helvetica", 24));
+		CheckBox dec = new CheckBox("Declination");
+		dec.setTextFill(Color.WHITE);
+		dec.setFont(Font.font("Helvetica", 24));
+	    CheckBox hflux = new CheckBox("Hard-Band Flux");
+	    hflux.setTextFill(Color.WHITE);
+	    hflux.setFont(Font.font("Helvetica", 24));
+	    CheckBox sflux = new CheckBox("Soft-Band Flux");
+	    sflux.setTextFill(Color.WHITE);
+	    sflux.setFont(Font.font("Helvetica", 24));
+	    CheckBox z = new CheckBox("Redshift");
+	    z.setTextFill(Color.WHITE);
+	    z.setFont(Font.font("Helvetica", 24));
+	    CheckBox rmag = new CheckBox("R-Band Magnitude");
+	    rmag.setTextFill(Color.WHITE);
+	    rmag.setFont(Font.font("Helvetica", 24));
+	    
+	    VBox first = new VBox(ra, dec, hflux);
+	    first.setSpacing(100);
+	    VBox sec = new VBox(sflux, z , rmag);
+	    sec.setSpacing(100);
+	    HBox boxes = new HBox(first, sec);
+	    boxes.setSpacing(30);
+	    
+	    VBox moreboxes = new VBox(hb, boxes);
+	    moreboxes.setSpacing(150);
+	    moreboxes.setTranslateX(-20);
+	    pane.setRight(moreboxes);
+	    
 }
 
-  public static void main(String[] args) throws FileNotFoundException, IOException, ParseException,
-      org.json.simple.parser.ParseException {
+  public static void main(String[] args) throws FileNotFoundException, IOException, ParseException, Exception {
     h = new Hashtable<Integer, SourceObject>();
     String filepath = "astroexample1.json";
     parseJSON(filepath);
