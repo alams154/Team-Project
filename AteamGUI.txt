@@ -1,0 +1,38 @@
+			BorderPane pane = new BorderPane();
+			Text text1 = new Text("Thank you for using \n      our program!");
+		    text1.setFill(Color.WHITE);
+		    text1.setFont(Font.font("Helvetica", FontWeight.BOLD, 40));
+		    Text text2 = new Text("Now exiting...");
+		    text2.setFill(Color.WHITE);
+		    text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
+		    TextFlow textFlow = new TextFlow(text1, text2);
+		     
+		    VBox bottomRight = new VBox(text2);
+		    bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+		    
+		    pane.setCenter(text1);
+		    pane.setPrefSize(500, 300);
+		    pane.setBottom(bottomRight);		   
+		    
+		    FileInputStream inputstream = new FileInputStream("../hs-1996-01-a-large_web.jpg"); 
+		    Image image = new Image(inputstream); 
+		    
+		    
+		    
+		    TextField enterID = new TextField();
+		    enterID.setPromptText("Enter ID");
+		    Label label1 = new Label("ID: ");
+		    label1.setTextFill(Color.WHITE);
+		    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
+		    HBox hb = new HBox(label1, enterID);
+		    hb.setAlignment(Pos.TOP_RIGHT);
+		    pane.setRight(hb);
+		    
+		    
+		    Scene exitScene = new Scene(pane);
+		    exitScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		    primaryStage.setScene(exitScene);
+		    primaryStage.show();
+		    primaryStage.setTitle("Exit");
+		    BackgroundImage back = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+		    pane.setBackground(new Background(back));
