@@ -47,8 +47,11 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 public class Main extends Application {
+  // hash table stores SourceObjects, indexing starts at 1
   private static Hashtable<Integer, SourceObject> h;
+  // Scene objects store each scene (page) of GUI
   private static Scene scene1, scene2, scene3, scene4;
+  // types stores the type of each SourceObject in the hashtable
   private static ArrayList<String> types;
 
   /**
@@ -184,10 +187,28 @@ public class Main extends Application {
     FileChooser chooser = new FileChooser();
     fileChooser.setOnAction(e -> {
       File selectedFile = chooser.showOpenDialog(primaryStage);
+      System.out.println(selectedFile.getName());
       if (selectedFile.getName()
           .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
           .equals(".json")) {
-        primaryStage.setScene(scene2);
+        try {
+          
+          parseJSON("./"+selectedFile.getName()+"");
+          scene2 = screen2Setup(primaryStage);
+          primaryStage.setScene(scene2);
+          
+        } catch (IOException e1) {
+          
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        } catch (ParseException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        } catch (org.json.simple.parser.ParseException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        }
+        
       } else {
         Alert invalidFile =
             new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
@@ -269,6 +290,8 @@ public class Main extends Application {
     Label listId = new Label("Source ID List");
     listId.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
     ObservableList<Text> items = FXCollections.observableArrayList();
+    if (h.get(1) != null)
+    System.out.println(h.get(1).ID);
     for (Integer i : h.keySet()) {
       // add id items
       items.add(
@@ -509,7 +532,7 @@ public class Main extends Application {
     h = new Hashtable<Integer, SourceObject>();
     types = new ArrayList<String>();
     System.out.println(System.getProperty("user.dir"));
-    parseJSON("./astroexample1.json");
+   // parseJSON("./astroexample1.json");
     // System.out.println("Test: ");
     // System.out.println("Source 2 z is: " + h.get(2).Z + ", should be " + 1.90);
     launch(args);
