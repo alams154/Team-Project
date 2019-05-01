@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -392,16 +393,17 @@ public class Main extends Application {
     });
     FileChooser chooser = new FileChooser();
     addSource.setOnAction(e -> {
-      File selectedFile = chooser.showOpenDialog(primaryStage);
-      if (selectedFile.getName()
-          .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
-          .equals(".json")) {
-        primaryStage.setScene(scene2);
-      } else {
-        Alert invalidFile =
-            new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
-        invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-      }
+        primaryStage.setTitle("Creating popup"); 
+ 	   
+        // create a button 
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initOwner(primaryStage);
+        VBox dialogVbox = new VBox(20);
+        dialogVbox.getChildren().add(new Text("This is a Dialog"));
+        Scene dialogScene = new Scene(dialogVbox, 300, 200);
+        dialog.setScene(dialogScene);
+        dialog.show();
     });
     write.setOnAction(e -> {
       primaryStage.setScene(scene3);
