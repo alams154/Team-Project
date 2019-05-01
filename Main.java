@@ -57,6 +57,8 @@ public class Main extends Application {
   private static ArrayList<String> types;
   // flag to tell if file has been read in yet
   static boolean fileRead;
+  
+  static int IDsAdded;
 
   /**
    * @param filepath
@@ -380,6 +382,7 @@ public class Main extends Application {
       if (fileRead) {
         try {
         int id_to_search = Integer.parseInt(enterID.getText());
+        dataToWrite.put(id_to_search, h.get(id_to_search));
         } catch (NumberFormatException f) {
           Alert invalidFile =
               new Alert(Alert.AlertType.INFORMATION, "Please enter an integer");
@@ -422,7 +425,7 @@ public class Main extends Application {
   private void inputBottomPaneScreen3(BorderPane bp, Stage primaryStage) {
     Button quit = new Button("Quit");
     quit.setFont(Font.font("Helvetica", 40));
-    Button open = new Button("Open File");
+    Button open = new Button("Open New File");
     open.setFont(Font.font("Helvetica", 40));
     Button back = new Button("Back to Input Page");
     back.setFont(Font.font("Helvetica", 40));
