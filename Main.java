@@ -49,10 +49,14 @@ import javafx.scene.text.TextFlow;
 public class Main extends Application {
   // hash table stores SourceObjects, indexing starts at 1
   private static Hashtable<Integer, SourceObject> h;
+  // hash table stores SourceObjects to write to a file, indexing starts at 1
+  private static Hashtable<Integer, SourceObject> dataToWrite;
   // Scene objects store each scene (page) of GUI
   private static Scene scene1, scene2, scene3, scene4;
   // types stores the type of each SourceObject in the hashtable
   private static ArrayList<String> types;
+  // flag to tell if file has been read in yet
+  static boolean fileRead;
 
   /**
    * @param filepath
@@ -80,7 +84,7 @@ public class Main extends Application {
       // look for/ save the name info for given package (vertex name)
 
       String type = (String) jsonPackage.get("type");
-     // System.out.println(type);
+      // System.out.println(type);
       if (type != null) {
         types.add(type.toString());
       }
@@ -192,13 +196,14 @@ public class Main extends Application {
           .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
           .equals(".json")) {
         try {
+          fileRead = true;
+          parseJSON("./" + selectedFile.getName() + "");
           
-          parseJSON("./"+selectedFile.getName()+"");
           scene2 = screen2Setup(primaryStage);
           primaryStage.setScene(scene2);
-          
+
         } catch (IOException e1) {
-          
+
           // TODO Auto-generated catch block
           e1.printStackTrace();
         } catch (ParseException e1) {
@@ -208,7 +213,7 @@ public class Main extends Application {
           // TODO Auto-generated catch block
           e1.printStackTrace();
         }
-        
+
       } else {
         Alert invalidFile =
             new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
@@ -291,7 +296,7 @@ public class Main extends Application {
     listId.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
     ObservableList<Text> items = FXCollections.observableArrayList();
     if (h.get(1) != null)
-    System.out.println(h.get(1).ID);
+      System.out.println(h.get(1).ID);
     for (Integer i : h.keySet()) {
       // add id items
       items.add(
@@ -317,6 +322,7 @@ public class Main extends Application {
     TextField enterID = new TextField();
     enterID.setPromptText("Enter Valid ID");
     Label label1 = new Label("Search ID: ");
+    
     label1.setTextFill(Color.WHITE);
     label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
     Label labelParams = new Label("Select Parameters: ");
@@ -371,8 +377,15 @@ public class Main extends Application {
     write.setFont(Font.font("Helvetica", 18));
 
     display.setOnAction(e -> {
-      Alert error = new Alert(Alert.AlertType.INFORMATION, "ERROR R2-3P0: NO BACKEND");
-      error.showAndWait().filter(response -> response == ButtonType.OK);
+      if (fileRead) {
+        try {
+        int id_to_search = Integer.parseInt(enterID.getText());
+        } catch (NumberFormatException f) {
+          Alert invalidFile =
+              new Alert(Alert.AlertType.INFORMATION, "Please enter an integer");
+          invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+        }
+        }
     });
     FileChooser chooser = new FileChooser();
     addSource.setOnAction(e -> {
@@ -531,8 +544,9 @@ public class Main extends Application {
       org.json.simple.parser.ParseException {
     h = new Hashtable<Integer, SourceObject>();
     types = new ArrayList<String>();
+    fileRead = false;
     System.out.println(System.getProperty("user.dir"));
-   // parseJSON("./astroexample1.json");
+    // parseJSON("./astroexample1.json");
     // System.out.println("Test: ");
     // System.out.println("Source 2 z is: " + h.get(2).Z + ", should be " + 1.90);
     launch(args);
