@@ -278,17 +278,17 @@ public class Main extends Application {
     Text text1 = new Text("Thank you for using \n      our program!");
     text1.setFill(Color.WHITE);
     text1.setFont(Font.font("Helvetica", FontWeight.BOLD, 40));
-    Text text2 = new Text("Now exiting...");
-    text2.setFill(Color.WHITE);
-    text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
+//    Text text2 = new Text("Now exiting...");
+//    text2.setFill(Color.WHITE);
+//    text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
     Button done = new Button("Close Program");
     done.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
-    VBox bottomRight = new VBox(text2);
-    bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+  //  VBox bottomRight = new VBox(text2);
+ //   bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
     pane.setRight(done);
     pane.setCenter(text1);
     pane.setPrefSize(500, 300);
-    pane.setBottom(bottomRight);
+  //  pane.setBottom(bottomRight);
 
     Image image = new Image("file:hs-1996-01-a-large_web.jpg");
 
@@ -314,11 +314,11 @@ public class Main extends Application {
     listId.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
     ObservableList<Text> items = FXCollections.observableArrayList();
     if (allData.get(1) != null)
-      System.out.println(allData.get(1).ID);
+      System.out.println(allData.get(1).getID());
     for (Integer i : allData.keySet()) {
       // add id items
       items.add(new Text(
-          "" + allData.get(allData.size() - i + 1).ID + ", Type: " + types.get(types.size() - i)));
+          "" + (int) allData.get(allData.size() - i + 1).getID() + ", Type: " + types.get(types.size() - i)));
     }
     
     listId.setTextFill(Color.WHITE);
@@ -409,6 +409,37 @@ public class Main extends Application {
     exit.setFont(Font.font("Helvetica", 18));
     TextField enterFileName = new TextField();
     enterFileName.setPromptText("Enter File Name");
+    
+    
+    Button help = new Button("Help");
+    help.setOnAction(e -> 
+           try {
+              final Stage helpPop = new Stage();
+              helpPop.initModality(Modality.APPLICATION_MODAL);
+              helpPop.initOwner(primaryStage);   
+              Label helpLabel = new Label("Help");
+              TextArea helpText = new TextArea("How to operate the program:\n"
+              +" There are many options that you have for going through the data\n"
+              +"that you read in from the file given.\n"
+              +"\n" +
+              "To add a new source, click the add button and add the preferred data\n"
+              +"to the popup window that appears.\n"
+              +"\n"+
+              "To display data, check the correct data that is desired from the checkboxes\n"
+              +"on the right and then click on the display button. A popup will appear, and\n"
+              +"if wanted, the data displayed can be saved to be written to another file by\n"
+              +"clicking on the save and exit button.\n"+
+              "\n"+
+              "To write to another file, click on the write button. If there is a valid ID in\n"
+              "the text field, all the data from that specific source is written to a separate json file.\n
+              If there is no ID written in the text field, then all the data from the IDs on the \n
+              second list will be written to a separate json file.");
+           
+           } catch (exception e) {
+              Alert helpError = new Alert(Alert.AlertType.INFORMATION, "Something went wrong when loading the help popup.");
+
+                    helpError.showAndWait().filter(response -> response == ButtonType.OK);
+           });
     exit.setOnAction(e -> {
       primaryStage.setScene(scene4);
     });
@@ -428,7 +459,7 @@ public class Main extends Application {
               System.out.println("adding " + searchID + " to hash");
               dataToWrite.put(IDsAdded + 1, allData.get(searchID));
               IDsAdded++;
-
+System.out.println("total IDs: " + IDsAdded);
               Button saveSrc = new Button("Save this source");
               saveSrc.setFont(Font.font("Helvetica", 30));
               Button ext = new Button("Exit without saving");
@@ -449,63 +480,75 @@ public class Main extends Application {
                 Label id_disp =
                     new Label("Displaying ID #" + searchID + ", " + types.get(searchID - 1));
                 id_disp.setFont(Font.font("Helvetica", 45));
-                Text right = new Text("Right Ascension: " + allData.get(searchID).RA + "°");
+                Text right = new Text("Right Ascension: " + allData.get(searchID).getRA() + "°");
 
                 right.setFont(Font.font("Helvetica", 30));
                 vbox1.getChildren().add(id_disp);
                 vbox1.getChildren().add(right);
 
+              } else {
+                dataToWrite.get(IDsAdded+1).setRA(-1.0);
               }
               if (dec.isSelected()) {
 
-                Text decl = new Text("Declination: " + allData.get(searchID).DEC + "°");
+                Text decl = new Text("Declination: " + allData.get(searchID).getDEC() + "°");
 
                 decl.setFont(Font.font("Helvetica", 30));
 
                 vbox1.getChildren().add(decl);
 
+              } else {
+                dataToWrite.get(IDsAdded+1).setDEC(-1.0);
               }
 
               if (hflux.isSelected()) {
 
                 Text horiz = new Text(
-                    "Hard-Band Flux: " + allData.get(searchID).HARD_FLUX + " cm^(-2) sec^(-1)");
+                    "Hard-Band Flux: " + allData.get(searchID).getHflux() + " cm^(-2) sec^(-1)");
 
                 horiz.setFont(Font.font("Helvetica", 30));
 
                 vbox1.getChildren().add(horiz);
 
+              } else {
+                dataToWrite.get(IDsAdded+1).setHflux(-1.0);
               }
 
               if (sflux.isSelected()) {
 
                 Text soft = new Text(
-                    "Soft-Band Flux: " + allData.get(searchID).SOFT_FLUX + " cm^(-2) sec^(-1)");
+                    "Soft-Band Flux: " + allData.get(searchID).getSflux() + " cm^(-2) sec^(-1)");
 
                 soft.setFont(Font.font("Helvetica", 30));
 
                 vbox1.getChildren().add(soft);
 
+              } else {
+                dataToWrite.get(IDsAdded+1).setSflux(-1.0);
               }
 
               if (z.isSelected()) {
 
-                Text zee = new Text("Redshift: " + allData.get(searchID).Z);
+                Text zee = new Text("Redshift: " + allData.get(searchID).getZ());
 
                 zee.setFont(Font.font("Helvetica", 30));
 
                 vbox1.getChildren().add(zee);
 
+              } else {
+                dataToWrite.get(IDsAdded+1).setZ(-1.0);
               }
 
               if (rmag.isSelected()) {
 
-                Text mag = new Text("R-Band Magnitude: " + allData.get(searchID).RMAG);
+                Text mag = new Text("R-Band Magnitude: " + allData.get(searchID).getRmag());
 
                 mag.setFont(Font.font("Helvetica", 30));
 
                 vbox1.getChildren().add(mag);
 
+              } else {
+                dataToWrite.get(IDsAdded+1).setRmag(-1.0);
               }
 
               vbox1.getChildren().add(saveExt);
@@ -584,7 +627,7 @@ public class Main extends Application {
 
   private void inputTopPaneScreen3(BorderPane bp) {
 
-    Label top = new Label("Successfully written data to file");
+    Label top = new Label("Successfully written " + IDsAdded + " IDs to a file");
     top.setFont((Font.font("Helvetica", FontWeight.BOLD, 36)));
     top.setTextFill(Color.WHITE);
 
@@ -598,12 +641,10 @@ public class Main extends Application {
 
     JSONArray allSources = new JSONArray();
     // Create the file
-    if (file.createNewFile()) {
-      System.out.println("File is created!");
-    } else {
-      System.out.println("File already exists.");
+    if (!file.createNewFile()) {
       return false;
-    }
+      
+    } 
 
     System.out.println("writing file, size of hash is " + dataToWrite.size());
     for (int i = 1; i <= dataToWrite.size(); i++) {
@@ -611,20 +652,20 @@ public class Main extends Application {
       JSONArray paramArr = new JSONArray();
       // First Employee
       JSONObject id = new JSONObject();
-      System.out.println(cur.ID);
-      id.put("id", "" + cur.ID);
+      
+      id.put("id", "" + cur.getID());
       JSONObject ra = new JSONObject();
-      ra.put("ra", "" + cur.RA);
+      ra.put("ra", "" + cur.getRA());
       JSONObject dec = new JSONObject();
-      dec.put("dec", "" + cur.DEC);
+      dec.put("dec", "" + cur.getDEC());
       JSONObject hflux = new JSONObject();
-      hflux.put("hflux", "" + cur.HARD_FLUX);
+      hflux.put("hflux", "" + cur.getHflux());
       JSONObject sflux = new JSONObject();
-      sflux.put("sflux", "" + cur.SOFT_FLUX);
+      sflux.put("sflux", "" + cur.getSflux());
       JSONObject z = new JSONObject();
-      z.put("z", "" + cur.Z);
+      z.put("z", "" + cur.getZ());
       JSONObject rmag = new JSONObject();
-      rmag.put("rmag", "" + cur.RMAG);
+      rmag.put("rmag", "" + cur.getRmag());
 
       paramArr.add(id);
       paramArr.add(ra);

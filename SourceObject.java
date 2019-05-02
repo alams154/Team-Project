@@ -8,27 +8,28 @@ package application;
  */
 public class SourceObject {
   // initialize parameters
-  final int ID;
+ private final int ID;
   // all parameters in cgs units:
   // RA, DEC in degrees
-  final double RA;
-  final double DEC;
+ private double RA;
+ private double DEC;
   // HARD_FLUX, SOFT_FLUX in erg s^-1 cm^-2
-  final double HARD_FLUX;
-  final double SOFT_FLUX;
+ private double HARD_FLUX;
+ private double SOFT_FLUX;
   // Z, unitless
-  final double Z;
+ private double Z;
   // RMAG, unitless
-  final double RMAG;
+ private double RMAG;
 
   /**
    * Constructor initializes parameters of the given source, in cgs units
+   * Negative values indicate no/null data.
    * 
    * @param id the ID of the object
-   * @param ra the RA coordinates of the object
-   * @param dec the DEC coordinates of the object
-   * @param hard_flux the hard-band flux of the object
-   * @param soft_flux the soft-band flux of the object
+   * @param ra the RA (Right Ascension) coordinates of the object
+   * @param dec the DEC (Declination) coordinates of the object
+   * @param hard_flux (Hard-band flux) the hard-band flux of the object
+   * @param soft_flux the Soft-band flux of the object
    * @param z the redshift of the object
    * @param rmag the R-band magnitude of the object
    */
@@ -53,6 +54,68 @@ public class SourceObject {
     return 1.303 * Math.pow(10, 28) * Z;
 
   }
-
+  public double getID() {
+    return this.ID;
+  }
+  public double getRA() {
+    if (RA != 0.0) {
+    return this.RA;
+    } else {
+      return -1.0;
+    }
+  }
+  public double getDEC() {
+    if (DEC != 0.0) {
+    return this.RA;
+    } else {
+      return -1.0;
+    }
+  }
+  public double getHflux() {
+    if (HARD_FLUX != 0.0) {
+    return this.RA;
+    } else {
+      return -1.0;
+    }
+  }
+  public double getSflux() {
+    if (SOFT_FLUX != 0.0) {
+    return this.RA;
+    } else {
+      return -1.0;
+    }
+  }
+    public double getZ() {
+      if (SOFT_FLUX != 0.0) {
+      return this.RA;
+      } else {
+        return -1.0;
+      }
+  }
+    public double getRmag() {
+      if (RMAG != 0.0) {
+      return this.RA;
+      } else {
+        return -1.0;
+      }
+  }
+    public void setRA(double ra) {
+      this.RA = ra;
+    }
+    public void setDEC(double dec) {
+      this.DEC = dec;
+    }
+    public void setHflux(double h) {
+      this.HARD_FLUX = h;
+    }
+    public void setSflux(double s) {
+      this.SOFT_FLUX = s;
+    }
+      public void setZ(double z) {
+        this.Z = z;
+    }
+      public void setRmag(double r) {
+        this.RMAG = r;
+    }
 
 }
