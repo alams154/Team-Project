@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -21,11 +22,13 @@ import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -68,6 +71,11 @@ public class Main extends Application {
   private static JSONArray astroRegion;
 
   private static File newFile;
+
+  final private static String[] params = new String[] {"ID", "Right Ascension", "Declination",
+      "Hard-Band Flux", "Soft-Band Flux", "Redshift", "R-Band Magnitude"};
+
+  private static int averageDistance;
 
   /**
    * @param filepath
@@ -278,17 +286,17 @@ public class Main extends Application {
     Text text1 = new Text("Thank you for using \n      our program!");
     text1.setFill(Color.WHITE);
     text1.setFont(Font.font("Helvetica", FontWeight.BOLD, 40));
-//    Text text2 = new Text("Now exiting...");
-//    text2.setFill(Color.WHITE);
-//    text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
+    // Text text2 = new Text("Now exiting...");
+    // text2.setFill(Color.WHITE);
+    // text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
     Button done = new Button("Close Program");
     done.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
-  //  VBox bottomRight = new VBox(text2);
- //   bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+    // VBox bottomRight = new VBox(text2);
+    // bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
     pane.setRight(done);
     pane.setCenter(text1);
     pane.setPrefSize(500, 300);
-  //  pane.setBottom(bottomRight);
+    // pane.setBottom(bottomRight);
 
     Image image = new Image("file:hs-1996-01-a-large_web.jpg");
 
@@ -308,7 +316,7 @@ public class Main extends Application {
    * @param bp
    */
   private void inputIDlist(BorderPane bp) {
-    ArrayList<String> ids = new ArrayList<String>();
+
     ListView<Text> list = new ListView<Text>();
     Label listId = new Label("Source ID List");
     listId.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
@@ -340,11 +348,47 @@ public class Main extends Application {
     // counter.getChildren().add(counts);
     // listCount.getChildren().add(counter);
     // bp.setLeft(listCount);
-    bp.setLeft(list);
+
+    ListView<Text> list2 = new ListView<Text>();
+    Label savedList = new Label("Saved ID List");
+    savedList.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
+    ObservableList<Text> savedItems = FXCollections.observableArrayList();
+    if (dataToWrite.get(1) != null)
+      System.out.println(dataToWrite.get(1).getID());
+    for (Integer i : dataToWrite.keySet()) {
+      // add id items
+      savedItems.add(new Text(
+          "" + (int) dataToWrite.get(dataToWrite.size() - i + 1).getID() ));
+    }
+    
+    savedList.setTextFill(Color.WHITE);
+    list2.setItems(savedItems);
+    // HBox listCount = new HBox();
+
+    bp.setTop(savedList);
+    for (Text t : list2.getItems()) {
+      t.setFont((Font.font("Helvetica", FontWeight.BOLD, 20)));
+      // (Font.font("Helvetica", FontWeight.BOLD, 24));
+    }
+    
+    VBox leftBox = new VBox(listId, list);
+    VBox rightBox = new VBox(savedList, list2);
+    HBox mainBox = new HBox(leftBox, rightBox);
+    
+    bp.setLeft(mainBox);
 
     // vbox.setBackground(new Background(new BackgroundFill(Color.WHITE,
     // CornerRadii.EMPTY,
     // Insets.EMPTY)));
+  }
+
+  private double getMeanDistance() {
+    double avg = 0;
+    for (int i = 0; i < allData.size(); i++) {
+      avg = avg + allData.get(i + 1).getDistance();
+    }
+
+    return avg / (allData.size());
   }
 
   private void inputRightPaneScreen2(BorderPane pane, Stage primaryStage) {
@@ -401,7 +445,7 @@ public class Main extends Application {
     // bottom buttons
     Button addSource = new Button("Add Source");
     addSource.setFont(Font.font("Helvetica", 18));
-    Button display = new Button("Display Source Data");
+    Button display = new Button("Display/Save Source Data");
     display.setFont(Font.font("Helvetica", 18));
     Button write = new Button("Write");
     write.setFont(Font.font("Helvetica", 18));
@@ -410,17 +454,35 @@ public class Main extends Application {
     exit.setFont(Font.font("Helvetica", 18));
     TextField enterFileName = new TextField();
     enterFileName.setPromptText("Enter File Name");
-    
-    
-    
+
+    Button average = new Button("Compute mean distance");
+    average.setFont(Font.font("Helvetica", 18));
+    average.setOnAction(e -> {
+      Alert meanDistance = new Alert(Alert.AlertType.INFORMATION,
+          "Mean Source Distance: " + getMeanDistance() + " cm");
+      meanDistance.showAndWait().filter(response -> response == ButtonType.OK);
+    });
+
     help.setOnAction(e -> {
-    Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
-        "How to operate the program:\n There are many options that you have for going through the data\n that you read in from the file given.\nTo add a new source, click the add button and add the preferred data\n to the popup window that appears.\n To display data, check the correct data that is desired from the checkboxes\n on the right and then click on the display button. A popup will appear, and\n if wanted, the data displayed can be saved to be written to another file by\n clicking on the save and exit button.\n To write to another file, click on the write button. If there is a valid ID in\n the text field, all the data from that specific source is written to a separate json file.\n If there is no ID written in the text field, then all the data from the IDs on the\n second list will be written to a separate json file.");
-    invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-             
-           
-           } );
-    
+      Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
+          "How to operate the program:\nThere are many options that you have for going through the"
+              + " data\nthat you read in from the file given. There are 3 analysis options"
+              + " as well as an option to exit.\n\n To add a new source, click the add"
+              + " button and add the preferred data\nto the popup window that appears.\n\n"
+              + " To display data, check the correct data that is desired from the "
+              + "checkboxes\non the right and then click on the display/save button. "
+              + "A popup will appear, and\nif wanted, the data displayed can be saved to"
+              + " be written to another json file by\nclicking on the save and exit"
+              + " button.\n\n To write to another file, click on the write button, "
+              + "and add a valid file name.\nInclude the .json at the end of the name "
+              + "in order for the file to be created successfully. \nOnce clicked, all "
+              + "sources (requested to save) from the second list will be written to a "
+              + "separate json file.");
+      invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+
+
+    });
+
     exit.setOnAction(e -> {
       primaryStage.setScene(scene4);
     });
@@ -440,145 +502,79 @@ public class Main extends Application {
               System.out.println("adding " + searchID + " to hash");
               dataToWrite.put(IDsAdded + 1, allData.get(searchID));
               IDsAdded++;
-System.out.println("total IDs: " + IDsAdded);
+              System.out.println("total IDs: " + IDsAdded);
               Button saveSrc = new Button("Save this source");
               saveSrc.setFont(Font.font("Helvetica", 30));
               Button ext = new Button("Exit without saving");
               ext.setFont(Font.font("Helvetica", 30));
               saveExt.getChildren().add(saveSrc);
               saveExt.getChildren().add(ext);
+              
               if (!allData.containsKey(searchID)) {
-
                 Alert invalidID = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
-
                 invalidID.showAndWait().filter(response -> response == ButtonType.OK);
-
               }
-
-
-
               if (ra.isSelected()) {
                 Label id_disp =
                     new Label("Displaying ID #" + searchID + ", " + types.get(searchID - 1));
                 id_disp.setFont(Font.font("Helvetica", 45));
                 Text right = new Text("Right Ascension: " + allData.get(searchID).getRA() + "°");
-
                 right.setFont(Font.font("Helvetica", 30));
                 vbox1.getChildren().add(id_disp);
                 vbox1.getChildren().add(right);
-
-              } else {
-                dataToWrite.get(IDsAdded+1).setRA(-1.0);
               }
               if (dec.isSelected()) {
-
                 Text decl = new Text("Declination: " + allData.get(searchID).getDEC() + "°");
-
                 decl.setFont(Font.font("Helvetica", 30));
-
                 vbox1.getChildren().add(decl);
-
-              } else {
-                dataToWrite.get(IDsAdded+1).setDEC(-1.0);
               }
-
               if (hflux.isSelected()) {
-
                 Text horiz = new Text(
                     "Hard-Band Flux: " + allData.get(searchID).getHflux() + " cm^(-2) sec^(-1)");
-
                 horiz.setFont(Font.font("Helvetica", 30));
-
                 vbox1.getChildren().add(horiz);
-
-              } else {
-                dataToWrite.get(IDsAdded+1).setHflux(-1.0);
               }
-
               if (sflux.isSelected()) {
-
                 Text soft = new Text(
                     "Soft-Band Flux: " + allData.get(searchID).getSflux() + " cm^(-2) sec^(-1)");
-
                 soft.setFont(Font.font("Helvetica", 30));
-
                 vbox1.getChildren().add(soft);
-
-              } else {
-                dataToWrite.get(IDsAdded+1).setSflux(-1.0);
               }
-
               if (z.isSelected()) {
-
                 Text zee = new Text("Redshift: " + allData.get(searchID).getZ());
-
                 zee.setFont(Font.font("Helvetica", 30));
-
                 vbox1.getChildren().add(zee);
-
-              } else {
-                dataToWrite.get(IDsAdded+1).setZ(-1.0);
               }
-
               if (rmag.isSelected()) {
-
                 Text mag = new Text("R-Band Magnitude: " + allData.get(searchID).getRmag());
-
                 mag.setFont(Font.font("Helvetica", 30));
-
                 vbox1.getChildren().add(mag);
-
-              } else {
-                dataToWrite.get(IDsAdded+1).setRmag(-1.0);
               }
-
               vbox1.getChildren().add(saveExt);
-
               Scene dialogScene = new Scene(vbox1, 800, 500);
-
               disp.setScene(dialogScene);
-
               disp.setTitle("Display Source");
               // add a button for closing and a button for saving
               disp.show();
 
               saveSrc.setOnAction(f -> {
-
+                scene2 = screen2Setup(primaryStage);
+                primaryStage.setScene(scene2);
                 disp.close();
               });
               ext.setOnAction(g -> {
-                System.out.println("removing " + searchID + " to hash");
                 dataToWrite.remove(IDsAdded + 1);
                 IDsAdded--;
-
                 disp.close();
               });
-
             } catch (NumberFormatException f) {
-
               Alert invalidFile = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
-
               invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-
             }
-
           }
-
-
-
         });
-    FileChooser chooser = new FileChooser();
     addSource.setOnAction(e -> {
-      File selectedFile = chooser.showOpenDialog(primaryStage);
-      if (selectedFile.getName()
-          .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
-          .equals(".json")) {
-        primaryStage.setScene(scene2);
-      } else {
-        Alert invalidFile =
-            new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
-        invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-      }
+      popupAddScreen2(primaryStage);
     });
     write.setOnAction(e -> {
       fileToWriteTo = enterFileName.getText().trim();
@@ -600,7 +596,7 @@ System.out.println("total IDs: " + IDsAdded);
     });
     HBox botRight = new HBox(write, enterFileName);
 
-    HBox botButtons = new HBox(help, addSource, display, botRight, exit);
+    HBox botButtons = new HBox(help, addSource, display, botRight, average, exit);
     botButtons.setSpacing(50);
     botButtons.setAlignment(Pos.CENTER);
     botButtons.setTranslateY(-30);
@@ -625,8 +621,8 @@ System.out.println("total IDs: " + IDsAdded);
     // Create the file
     if (!file.createNewFile()) {
       return false;
-      
-    } 
+
+    }
 
     System.out.println("writing file, size of hash is " + dataToWrite.size());
     for (int i = 1; i <= dataToWrite.size(); i++) {
@@ -634,7 +630,7 @@ System.out.println("total IDs: " + IDsAdded);
       JSONArray paramArr = new JSONArray();
       // First Employee
       JSONObject id = new JSONObject();
-      
+
       id.put("id", "" + cur.getID());
       JSONObject ra = new JSONObject();
       ra.put("ra", "" + cur.getRA());
@@ -763,20 +759,7 @@ System.out.println("total IDs: " + IDsAdded);
     }
   }
 
-  private void idParameters(BorderPane pane) {
 
-  }
-
-  private void idLookUp(BorderPane pane) {
-    TextField enterID = new TextField();
-    enterID.setPromptText("Enter ID");
-    Label label1 = new Label("ID: ");
-    label1.setTextFill(Color.WHITE);
-    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
-    HBox hb = new HBox(label1, enterID);
-    hb.setAlignment(Pos.TOP_RIGHT);
-    pane.setRight(hb);
-  }
 
   @Override
   public void start(Stage primaryStage) {
@@ -805,12 +788,175 @@ System.out.println("total IDs: " + IDsAdded);
     types = new ArrayList<String>();
     dataToWrite = new Hashtable<Integer, SourceObject>();
     fileRead = false;
-    
+
     System.out.println(System.getProperty("user.dir"));
-    // parseJSON("./astroexample1.json");
-    // System.out.println("Test: ");
-    // System.out.println("Source 2 z is: " + h.get(2).Z + ", should be " + 1.90);
+
     launch(args);
+  }
+
+  private void popupAddScreen2(Stage primaryStage) {
+    primaryStage.setTitle("Creating popup");
+
+    Stage popup = new Stage();
+    popup.initModality(Modality.APPLICATION_MODAL);
+    popup.initOwner(primaryStage);
+
+    VBox leftVbox = new VBox(20);
+    Label type = new Label("Select Type:");
+    type.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+    ObservableList<String> options =
+        FXCollections.observableArrayList(types.stream().distinct().collect(Collectors.toList()));
+    ComboBox<String> c = new ComboBox<String>(options);
+    VBox typeBox = new VBox(5);
+    typeBox.getChildren().addAll(type, c);
+    leftVbox.getChildren().add(typeBox);
+    for (int i = 1; i < params.length - 3; i++) {
+      VBox temp = new VBox(10);
+      TextField tf = new TextField();
+      tf.setPromptText(params[i]);
+      Label l = new Label(params[i] + ":");
+      l.setTextFill(Color.BLACK);
+      l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+      temp.getChildren().addAll(l, tf);
+      leftVbox.getChildren().add(temp);
+    }
+    leftVbox.setTranslateX(10);
+
+    VBox centerVbox = new VBox(20);
+    for (int i = params.length - 3; i < params.length; i++) {
+      VBox temp = new VBox(10);
+      TextField tf = new TextField();
+      tf.setPromptText(params[i]);
+      tf.setMaxWidth(157);
+      Label l = new Label(params[i] + ":");
+      l.setTextFill(Color.BLACK);
+      l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+      temp.getChildren().addAll(l, tf);
+      centerVbox.getChildren().add(temp);
+    }
+    centerVbox.setAlignment(Pos.BASELINE_CENTER);
+    centerVbox.setTranslateY(37);
+    centerVbox.setTranslateX(100);
+
+    HBox bottomHbox = new HBox(20);
+    Button addSource = new Button("Add Source");
+    addSource.setFont(Font.font("Helvetica", 20));
+    Button addAndExit = new Button("Add Source and Exit");
+    addAndExit.setFont(Font.font("Helvetica", 20));
+    Button exit = new Button("Exit");
+    exit.setFont(Font.font("Helvetica", 20));
+    bottomHbox.getChildren().addAll(addSource, addAndExit, exit);
+    bottomHbox.setAlignment(Pos.BOTTOM_CENTER);
+    bottomHbox.setTranslateY(-10);
+
+    BorderPane bp = new BorderPane();
+    bp.setLeft(leftVbox);
+    bp.setCenter(centerVbox);
+    bp.setBottom(bottomHbox);
+    Scene popupScene = new Scene(bp, 600, 400);
+    popup.setScene(popupScene);
+    popup.show();
+
+    addSource.setOnAction(e -> {
+      String[][] pVals = new String[2][4];
+
+      pVals[0] = popupVboxIterator(leftVbox);
+      pVals[1] = popupVboxIterator(centerVbox);
+
+      SourceObject s = null;
+      try {
+        s = popupSourceObject(pVals);
+        allData.put(types.size() + 1, s);
+        if (pVals[0][0].equals("null")) {
+          throw new NullPointerException();
+        }
+        types.add(pVals[0][0]);
+        scene2 = screen2Setup(primaryStage);
+        primaryStage.setScene(scene2);
+      } catch (NullPointerException np) {
+        allData.remove(types.size() + 1, s);
+        Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
+        invalid.showAndWait().filter(response -> response == ButtonType.OK);
+      } catch (NumberFormatException nf) {
+        Alert invalid =
+            new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
+        invalid.showAndWait().filter(response -> response == ButtonType.OK);
+      }
+    });
+
+    addAndExit.setOnAction(e -> {
+      String[][] pVals = new String[2][4];
+
+      pVals[0] = popupVboxIterator(leftVbox);
+      pVals[1] = popupVboxIterator(centerVbox);
+
+      boolean exception = false;
+      SourceObject s = null;
+      try {
+        s = popupSourceObject(pVals);
+        allData.put(types.size() + 1, s);
+        if (pVals[0][0].equals("null")) {
+          throw new NullPointerException();
+        }
+        types.add(pVals[0][0]);
+        scene2 = screen2Setup(primaryStage);
+        primaryStage.setScene(scene2);
+      } catch (NullPointerException np) {
+        allData.remove(types.size() + 1, s);
+        Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
+        invalid.showAndWait().filter(response -> response == ButtonType.OK);
+        exception = true;
+      } catch (NumberFormatException nf) {
+        Alert invalid =
+            new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
+        invalid.showAndWait().filter(response -> response == ButtonType.OK);
+        exception = true;
+      }
+
+      if (!exception) {
+        popup.close();
+      }
+    });
+
+    exit.setOnAction(e -> {
+      popup.close();
+    });
+
+  }
+
+  private String[] popupVboxIterator(VBox top) {
+    String[] arr = new String[4];
+    int i = 1;
+    for (Node v : top.getChildren()) {
+      if (v instanceof VBox) {
+        VBox vb = (VBox) v;
+        for (Node n : vb.getChildren()) {
+          if (n instanceof ComboBox) {
+            ComboBox<String> cb = (ComboBox<String>) n;
+            arr[0] = cb.getValue();
+          } else if (n instanceof TextField) {
+            TextField t = (TextField) n;
+            arr[i] = t.getText();
+            i++;
+          }
+        }
+      }
+    }
+    return arr;
+  }
+
+  private SourceObject popupSourceObject(String[][] arr) throws NumberFormatException {
+    double[][] pVals = new double[2][4];
+    for (int i = 0; i < arr.length; i++) {
+      for (int j = 1; j < arr.length; j++) {
+        pVals[i][j] = Double.parseDouble(arr[i][j]);
+      }
+    }
+
+    SourceObject so = new SourceObject(types.size() + 1, pVals[0][1], pVals[0][2], pVals[0][3],
+        pVals[1][1], pVals[1][2], pVals[1][3]);
+
+    return so;
   }
 
 }

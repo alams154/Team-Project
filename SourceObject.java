@@ -66,35 +66,35 @@ public class SourceObject {
   }
   public double getDEC() {
     if (DEC != 0.0) {
-    return this.RA;
+    return this.DEC;
     } else {
       return -1.0;
     }
   }
   public double getHflux() {
     if (HARD_FLUX != 0.0) {
-    return this.RA;
+    return this.HARD_FLUX;
     } else {
       return -1.0;
     }
   }
   public double getSflux() {
     if (SOFT_FLUX != 0.0) {
-    return this.RA;
+    return this.SOFT_FLUX;
     } else {
       return -1.0;
     }
   }
     public double getZ() {
-      if (SOFT_FLUX != 0.0) {
-      return this.RA;
+      if (Z != 0.0) {
+      return this.Z;
       } else {
         return -1.0;
       }
   }
     public double getRmag() {
       if (RMAG != 0.0) {
-      return this.RA;
+      return this.RMAG;
       } else {
         return -1.0;
       }
