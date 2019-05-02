@@ -1,0 +1,11 @@
+{"ModifiedAstronomicalData":[{"type:":"AGN"},
+{"parameterArray":[
+{"id":"3"},
+{"ra":"334.05"},
+{"dec":"2.73"},
+{"hflux":"5.24E-15"},
+{"sflux":"9.2E-16"},
+{"z":"2.12"},
+{"rmag":"26.0"}]},
+{"type:":"Star-Forming"},
+{"parameterArray":[{"id":"6"},{"ra":"334.27"},{"dec":"2.53"},{"hflux":"3.24E-15"},{"sflux":"1.1E-15"},{"z":"3.24"},{"rmag":"26.27"}]}]}
