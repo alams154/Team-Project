@@ -27,3 +27,6 @@ help.setOnAction(e ->
 
                 helpError.showAndWait().filter(response -> response == ButtonType.OK);
 	   });
+	   
+	   
+	"How to operate the program:\nThere are many options that you have for going through the data\nthat you read in from the file given. There are 3 options,\nand an option to exit.\n\n To add a new source, click the add button and add the preferred data\nto the popup window that appears.\n\n To display data, check the correct data that is desired from the checkboxes\non the right and then click on the display/save button. A popup will appear, and\nif wanted, the data displayed can be saved to be written to another json file by\nclicking on the save and exit button.\n\n To write to another file, click on the write button, and add a valid file name.\nInclude the .json at the end of the name in order for the file to be created\nsuccessfully. Once clicked, all sources from the second list will be written to a separate json file.");
