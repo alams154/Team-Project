@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -57,9 +58,11 @@ public class Main extends Application {
   // types stores the type of each SourceObject in the hashtable
   private static ArrayList<String> types;
   // flag to tell if file has been read in yet
-  static boolean fileRead;
-  
-  static int IDsAdded;
+  private static boolean fileRead;
+
+  private static int IDsAdded;
+
+  private static String fileToWriteTo;
 
   /**
    * @param filepath
@@ -201,7 +204,7 @@ public class Main extends Application {
         try {
           fileRead = true;
           parseJSON("./" + selectedFile.getName() + "");
-          
+
           scene2 = screen2Setup(primaryStage);
           primaryStage.setScene(scene2);
 
@@ -325,7 +328,7 @@ public class Main extends Application {
     TextField enterID = new TextField();
     enterID.setPromptText("Enter Valid ID");
     Label label1 = new Label("Search ID: ");
-    
+
     label1.setTextFill(Color.WHITE);
     label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
     Label labelParams = new Label("Select Parameters: ");
@@ -379,49 +382,187 @@ public class Main extends Application {
     Button write = new Button("Write");
     write.setFont(Font.font("Helvetica", 18));
 
-    display.setOnAction(e -> {
-      if (fileRead) {
-        try {
-        int id_to_search = Integer.parseInt(enterID.getText());
-        dataToWrite.put(id_to_search, h.get(id_to_search));
-        } catch (NumberFormatException f) {
-          Alert invalidFile =
-              new Alert(Alert.AlertType.INFORMATION, "Please enter an integer");
-          invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-        }
-        }
+    Button exit = new Button("Exit");
+    exit.setFont(Font.font("Helvetica", 18));
+    TextField enterFileName = new TextField();
+    enterFileName.setPromptText("Enter File Name");
+    exit.setOnAction(e -> {
+      primaryStage.setScene(scene4);
     });
+    display.setOnAction(
+
+        e -> {
+
+
+
+          if (fileRead) {
+
+            try {
+
+              final Stage disp = new Stage();
+
+              disp.initModality(Modality.APPLICATION_MODAL);
+
+              disp.initOwner(primaryStage);
+
+              VBox vbox1 = new VBox();
+
+
+
+              int searchID = Integer.parseInt(enterID.getText().trim());
+
+              if (!h.containsKey(searchID)) {
+
+                Alert invalidID = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
+
+                invalidID.showAndWait().filter(response -> response == ButtonType.OK);
+
+              }
+
+
+
+              if (ra.isSelected()) {
+                Label id_disp = new Label("Displaying ID #" + searchID);
+                id_disp.setFont(Font.font("Helvetica", 45));
+                Text right = new Text("Right Ascension: " + h.get(searchID).RA + "°");
+
+                right.setFont(Font.font("Helvetica", 30));
+                vbox1.getChildren().add(id_disp);
+                vbox1.getChildren().add(right);
+
+              }
+
+              if (dec.isSelected()) {
+
+                Text decl = new Text("Declination: " + h.get(searchID).DEC + "°");
+
+                decl.setFont(Font.font("Helvetica", 30));
+
+                vbox1.getChildren().add(decl);
+
+              }
+
+              if (hflux.isSelected()) {
+
+                Text horiz =
+                    new Text("Hard-Band Flux: " + h.get(searchID).HARD_FLUX + " cm^(-2) sec^(-1)");
+
+                horiz.setFont(Font.font("Helvetica", 30));
+
+                vbox1.getChildren().add(horiz);
+
+              }
+
+              if (sflux.isSelected()) {
+
+                Text soft =
+                    new Text("Soft-Band Flux: " + h.get(searchID).SOFT_FLUX + " cm^(-2) sec^(-1)");
+
+                soft.setFont(Font.font("Helvetica", 30));
+
+                vbox1.getChildren().add(soft);
+
+              }
+
+              if (z.isSelected()) {
+
+                Text zee = new Text("Redshift: " + h.get(searchID).Z);
+
+                zee.setFont(Font.font("Helvetica", 30));
+
+                vbox1.getChildren().add(zee);
+
+              }
+
+              if (rmag.isSelected()) {
+
+                Text mag = new Text("R-Band Magnitude: " + h.get(searchID).RMAG);
+
+                mag.setFont(Font.font("Helvetica", 30));
+
+                vbox1.getChildren().add(mag);
+
+              }
+
+
+
+              Scene dialogScene = new Scene(vbox1, 800, 500);
+
+              disp.setScene(dialogScene);
+
+              disp.setTitle("Display");
+
+              disp.show();
+
+            } catch (NumberFormatException f) {
+
+              Alert invalidFile = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
+
+              invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+
+            }
+
+          }
+
+
+
+        });
     FileChooser chooser = new FileChooser();
     addSource.setOnAction(e -> {
-        primaryStage.setTitle("Creating popup"); 
- 	   
-        // create a button 
-        Stage dialog = new Stage();
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.initOwner(primaryStage);
-        VBox dialogVbox = new VBox(20);
-        dialogVbox.getChildren().add(new Text("This is a Dialog"));
-        Scene dialogScene = new Scene(dialogVbox, 300, 200);
-        dialog.setScene(dialogScene);
-        dialog.show();
+      File selectedFile = chooser.showOpenDialog(primaryStage);
+      if (selectedFile.getName()
+          .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
+          .equals(".json")) {
+        primaryStage.setScene(scene2);
+      } else {
+        Alert invalidFile =
+            new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
+        invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+      }
     });
     write.setOnAction(e -> {
+      fileToWriteTo = enterFileName.getText().trim();
+      try {
+        writeToFile(fileToWriteTo);
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
       primaryStage.setScene(scene3);
     });
+    HBox botRight = new HBox(write, enterFileName);
 
-    HBox botButtons = new HBox(addSource, display, write);
-    botButtons.setSpacing(100);
+    HBox botButtons = new HBox(addSource, display, botRight, exit);
+    botButtons.setSpacing(50);
     botButtons.setAlignment(Pos.CENTER);
     botButtons.setTranslateY(-30);
     pane.setBottom(botButtons);
   }
 
   private void inputTopPaneScreen3(BorderPane bp) {
-    Label top = new Label("ERROR R2-3P0: NO BACKEND");
+
+    Label top = new Label("Successfully written data to file");
     top.setFont((Font.font("Helvetica", FontWeight.BOLD, 36)));
-    top.setTextFill(Color.RED);
+    top.setTextFill(Color.WHITE);
 
     bp.setTop(top);
+  }
+
+  private boolean writeToFile(String fileName) throws IOException {
+    File file = new File("c://temp//testFile1.txt");
+
+    // Create the file
+    if (file.createNewFile()) {
+      System.out.println("File is created!");
+    } else {
+      System.out.println("File already exists.");
+    }
+
+    // Write Content
+    FileWriter writer = new FileWriter(file);
+    writer.write("Test data");
+    writer.close();
+    return true;
   }
 
   private void inputBottomPaneScreen3(BorderPane bp, Stage primaryStage) {
@@ -550,6 +691,7 @@ public class Main extends Application {
     h = new Hashtable<Integer, SourceObject>();
     types = new ArrayList<String>();
     fileRead = false;
+    IDsAdded = 0;
     System.out.println(System.getProperty("user.dir"));
     // parseJSON("./astroexample1.json");
     // System.out.println("Test: ");
