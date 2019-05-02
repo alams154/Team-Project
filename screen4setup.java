@@ -1,6 +1,7 @@
-   /**
-   * method that creates
-   * @return
+   /*
+   * Method that creates the fourth screen,
+   * which is the exit screen displayed when
+   * closing the program
    */
   private Scene screen4Setup(Stage s) {
     BorderPane pane = new BorderPane(); // set up the border pane
