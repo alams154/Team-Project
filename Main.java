@@ -4,15 +4,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -20,11 +25,14 @@ import javafx.geometry.Pos;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -49,654 +57,672 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 
 public class Main extends Application {
-  // hash table stores SourceObjects, indexing starts at 1
-  private static Hashtable<Integer, SourceObject> h;
-  // hash table stores SourceObjects to write to a file, indexing starts at 1
-  private static Hashtable<Integer, SourceObject> dataToWrite;
-  // Scene objects store each scene (page) of GUI
-  private static Scene scene1, scene2, scene3, scene4;
-  // types stores the type of each SourceObject in the hashtable
-  private static ArrayList<String> types;
-  // flag to tell if file has been read in yet
-  private static boolean fileRead;
-
-  private static int IDsAdded;
-
-  private static String fileToWriteTo;
-
-  /**
-   * @param filepath
-   * @throws IOException
-   * @throws ParseException
-   * @throws org.json.simple.parser.ParseException
-   * @throws org.json.simple.parser.ParseException
-   */
-  private static void parseJSON(String filepath)
-      throws IOException, ParseException, org.json.simple.parser.ParseException {
-    // astroexample1
-    FileReader f = new FileReader(filepath);
-    // first, parse JSON file given the file path
-    Object obj = new JSONParser().parse(f);
-    // then create a JSON Object to represent file
-    JSONObject jo = (JSONObject) obj;
-    // create JSONArray to represent vertices from JSON file
-    JSONArray packages = (JSONArray) jo.get("SSA22Field");
-    // SSA22_Field
-    // iterate though all vertices (packages)
-
-    for (int i = 0; i < packages.size(); i++) {
-      // create JSONObject to hold given package
-      JSONObject jsonPackage = (JSONObject) packages.get(i);
-      // look for/ save the name info for given package (vertex name)
-
-      String type = (String) jsonPackage.get("type");
-      // System.out.println(type);
-      if (type != null) {
-        types.add(type.toString());
-      }
-      // create a JSONArray object to store the dependencies of the given package
-      // this is the same as the edges of this given vertex
-      JSONArray array = (JSONArray) jsonPackage.get("parameterArray");
-      // create a String[] array large enough to store these dependencies
-      String[] params = new String[array.size()];
-      JSONObject idpar = (JSONObject) array.get(0);
-      String id = (String) idpar.get("id");
-      int ide = Integer.parseInt(id);
-      // System.out.println("ID: " + id);
-      // iterate through the JSON array
-
-      for (int j = 0; j < array.size(); j++) {
-        // copy the package/ vertex names into String[] array
-        params[j] = (String) array.get(j).toString();
-
-        // System.out.println(params[j]);
-
-      }
-      double rightasc = 0;
-      JSONObject ras = (JSONObject) array.get(1);
-      String right = (String) ras.get("ra");
-      if (right.length() > 0) {
-        rightasc = Double.parseDouble((String) right);
-      }
-
-      double decl = 0;
-      JSONObject decc = (JSONObject) array.get(2);
-      String dec = (String) decc.get("dec");
-      if (dec.length() > 0) {
-        decl = Double.parseDouble((String) dec);
-      }
-
-      double hard = 0;
-      JSONObject ha = (JSONObject) array.get(3);
-      String hardf = (String) ha.get("hflux");
-      if (hardf.length() > 0) {
-        hard = Double.parseDouble(hardf);
-      }
-
-      double soft = 0;
-      JSONObject sof = (JSONObject) array.get(4);
-      String softf = (String) sof.get("sflux");
-      if (softf.length() > 0) {
-        soft = Double.parseDouble((String) softf);
-      }
-
-      double z = 0;
-      JSONObject redshift = (JSONObject) array.get(5);
-      String redz = (String) redshift.get("z");
-      if (redz.length() > 0) {
-        z = Double.parseDouble(redz);
-      }
-
-      double rmagnit = 0;
-      JSONObject rmag = (JSONObject) array.get(6);
-      String rmagn = (String) rmag.get("rmag");
-      if (rmagn.length() > 0) {
-        rmagnit = Double.parseDouble((String) rmagn);
-      }
-
-      SourceObject so = new SourceObject(ide, rightasc, decl, hard, soft, z, rmagnit);
-
-      h.put(ide, so);
-    }
-  }
-
-  private Scene screen1Setup(Stage primaryStage) {
-    BorderPane mainMenu = new BorderPane();
-
-    Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
-    mainMenu.setBackground(new Background(new BackgroundImage(bg, BackgroundRepeat.REPEAT,
-        BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
-        new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
-    Image power = new Image("file:Power.png");
-    ImageView powerView = new ImageView(power);
-    powerView.setFitHeight(60);
-    powerView.setFitWidth(60);
-    Button powerButton = new Button(null, powerView);
-    mainMenu.setRight(powerButton);
-    Text title = new Text("Astronomical Catalog Data Receiver");
-    title.setFont(Font.font("Helvetica", 48));
-    title.setFill(Color.WHITE);
-    TextFlow titleBox = new TextFlow(title);
-    titleBox.setTextAlignment(TextAlignment.CENTER);
-    mainMenu.setTop(titleBox);
-    Button fileChooser = new Button("Select File");
-    fileChooser.setFont(Font.font("Helvetica", 42));
-    mainMenu.setCenter(fileChooser);
-    Button recentFile = new Button("Read most recent file");
-    recentFile.setFont(Font.font("Helvetica", 36));
-    Button recentID = new Button("Read all data from most recent ID");
-    recentID.setFont(Font.font("Helvetica", 36));
-    Button skipLoad = new Button("Skip File Selection");
-    skipLoad.setFont(Font.font("Helvetica", 36));
-    VBox bottomRight = new VBox(skipLoad, recentFile, recentID);
-    bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
-    bottomRight.setSpacing(25);
-    bottomRight.setTranslateY(-20);
-    mainMenu.setBottom(bottomRight);
-
-    FileChooser chooser = new FileChooser();
-    fileChooser.setOnAction(e -> {
-      File selectedFile = chooser.showOpenDialog(primaryStage);
-      System.out.println(selectedFile.getName());
-      if (selectedFile.getName()
-          .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
-          .equals(".json")) {
-        try {
-          fileRead = true;
-          parseJSON("./" + selectedFile.getName() + "");
-
-          scene2 = screen2Setup(primaryStage);
-          primaryStage.setScene(scene2);
-
-        } catch (IOException e1) {
-
-          // TODO Auto-generated catch block
-          e1.printStackTrace();
-        } catch (ParseException e1) {
-          // TODO Auto-generated catch block
-          e1.printStackTrace();
-        } catch (org.json.simple.parser.ParseException e1) {
-          // TODO Auto-generated catch block
-          e1.printStackTrace();
-        }
-
-      } else {
-        Alert invalidFile =
-            new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
-        invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-      }
-    });
-    recentFile.setOnAction(e -> {
-      primaryStage.setScene(scene3);
-    });
-    recentID.setOnAction(e -> {
-      primaryStage.setScene(scene3);
-    });
-    powerButton.setOnAction(e -> {
-      primaryStage.setScene(scene4);
-    });
-    skipLoad.setOnAction(e -> {
-      primaryStage.setScene(scene2);
-    });
-
-    return new Scene(mainMenu, 1200, 800);
-  }
-
-  private Scene screen2Setup(Stage primaryStage) {
-    BorderPane s2bp = new BorderPane();
-    Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
-    s2bp.setBackground(new Background(new BackgroundImage(bg, BackgroundRepeat.REPEAT,
-        BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
-        new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
-    inputIDlist(s2bp);
-    inputRightPaneScreen2(s2bp, primaryStage);
-    return new Scene(s2bp, 1200, 800);
-
-  }
-
-  private Scene screen3Setup(Stage primaryStage) {
-    BorderPane results = new BorderPane();
-    Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
-    results.setBackground(new Background(new BackgroundImage(bg, BackgroundRepeat.REPEAT,
-        BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
-        new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
-    inputTopPaneScreen3(results);
-    inputBottomPaneScreen3(results, primaryStage);
-    return new Scene(results, 1200, 800);
-  }
-
-  private Scene screen4Setup() {
-    BorderPane pane = new BorderPane();
-    Text text1 = new Text("Thank you for using \n      our program!");
-    text1.setFill(Color.WHITE);
-    text1.setFont(Font.font("Helvetica", FontWeight.BOLD, 40));
-    Text text2 = new Text("Now exiting...");
-    text2.setFill(Color.WHITE);
-    text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
-
-    VBox bottomRight = new VBox(text2);
-    bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
-
-    pane.setCenter(text1);
-    pane.setPrefSize(500, 300);
-    pane.setBottom(bottomRight);
-
-    Image image = new Image("file:hs-1996-01-a-large_web.jpg");
-
-    Scene exitScene = new Scene(pane, 1200, 800);
-    BackgroundImage back = new BackgroundImage(image, BackgroundRepeat.REPEAT,
-        BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
-    pane.setBackground(new Background(back));
-    return exitScene;
-  }
-
-  /**
-   * This method adds the list of source IDs to the GUI
-   * 
-   * @param bp
-   */
-  private void inputIDlist(BorderPane bp) {
-    ArrayList<String> ids = new ArrayList<String>();
-    ListView<Text> list = new ListView<Text>();
-    Label listId = new Label("Source ID List");
-    listId.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
-    ObservableList<Text> items = FXCollections.observableArrayList();
-    if (h.get(1) != null)
-      System.out.println(h.get(1).ID);
-    for (Integer i : h.keySet()) {
-      // add id items
-      items.add(
-          new Text("" + h.get(h.size() - i + 1).ID + ", Type: " + types.get(types.size() - i)));
-    }
-    // + types.get(types.size() -i)
-    listId.setTextFill(Color.WHITE);
-    list.setItems(items);
-
-    bp.setTop(listId);
-    for (Text t : list.getItems()) {
-      t.setFont((Font.font("Helvetica", FontWeight.BOLD, 20)));
-      // (Font.font("Helvetica", FontWeight.BOLD, 24));
-    }
-    bp.setLeft(list);
-
-    // vbox.setBackground(new Background(new BackgroundFill(Color.WHITE,
-    // CornerRadii.EMPTY,
-    // Insets.EMPTY)));
-  }
-
-  private void inputRightPaneScreen2(BorderPane pane, Stage primaryStage) {
-    TextField enterID = new TextField();
-    enterID.setPromptText("Enter Valid ID");
-    Label label1 = new Label("Search ID: ");
-
-    label1.setTextFill(Color.WHITE);
-    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
-    Label labelParams = new Label("Select Parameters: ");
-    labelParams.setTextFill(Color.WHITE);
-    labelParams.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
-    HBox hb = new HBox(new VBox(label1, new Label(""), labelParams),
-        new VBox(enterID, new Label(""), new Label("")));
-    hb.setAlignment(Pos.BOTTOM_RIGHT);
-
-    CheckBox ra = new CheckBox("Right Ascension");
-    ra.setTextFill(Color.WHITE);
-    ra.setFont(Font.font("Helvetica", 24));
-    CheckBox dec = new CheckBox("Declination");
-    dec.setTextFill(Color.WHITE);
-    dec.setFont(Font.font("Helvetica", 24));
-    CheckBox hflux = new CheckBox("Hard-Band Flux");
-    hflux.setTextFill(Color.WHITE);
-    hflux.setFont(Font.font("Helvetica", 24));
-    CheckBox sflux = new CheckBox("Soft-Band Flux");
-    sflux.setTextFill(Color.WHITE);
-    sflux.setFont(Font.font("Helvetica", 24));
-    CheckBox z = new CheckBox("Redshift");
-    z.setTextFill(Color.WHITE);
-    z.setFont(Font.font("Helvetica", 24));
-    CheckBox rmag = new CheckBox("R-Band Magnitude");
-    rmag.setTextFill(Color.WHITE);
-    rmag.setFont(Font.font("Helvetica", 24));
-    CheckBox all = new CheckBox("Select All");
-    all.setTextFill(Color.WHITE);
-    all.setFont(Font.font("Helvetica", 24));
-
-    VBox first = new VBox(ra, dec, hflux);
-    first.setSpacing(100);
-    VBox sec = new VBox(sflux, z, rmag);
-    sec.setSpacing(100);
-    HBox boxes = new HBox(first, sec);
-    boxes.setSpacing(30);
-
-    VBox moreboxes = new VBox(hb, boxes, all);
-    moreboxes.setSpacing(100);
-    moreboxes.setTranslateX(-20);
-    moreboxes.setTranslateY(10);
-    moreboxes.setAlignment(Pos.TOP_CENTER);
-    pane.setRight(moreboxes);
-    all.setOnAction(e -> checkall(ra, dec, hflux, sflux, z, rmag, all));
-    // bottom buttons
-    Button addSource = new Button("Add Source");
-    addSource.setFont(Font.font("Helvetica", 18));
-    Button display = new Button("Display Source Data");
-    display.setFont(Font.font("Helvetica", 18));
-    Button write = new Button("Write");
-    write.setFont(Font.font("Helvetica", 18));
-
-    Button exit = new Button("Exit");
-    exit.setFont(Font.font("Helvetica", 18));
-    TextField enterFileName = new TextField();
-    enterFileName.setPromptText("Enter File Name");
-    exit.setOnAction(e -> {
-      primaryStage.setScene(scene4);
-    });
-    display.setOnAction(
-
-        e -> {
-
-
-
-          if (fileRead) {
-
-            try {
-
-              final Stage disp = new Stage();
-
-              disp.initModality(Modality.APPLICATION_MODAL);
-
-              disp.initOwner(primaryStage);
-
-              VBox vbox1 = new VBox();
-
-
-
-              int searchID = Integer.parseInt(enterID.getText().trim());
-
-              if (!h.containsKey(searchID)) {
-
-                Alert invalidID = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
-
-                invalidID.showAndWait().filter(response -> response == ButtonType.OK);
-
-              }
-
-
-
-              if (ra.isSelected()) {
-                Label id_disp = new Label("Displaying ID #" + searchID);
-                id_disp.setFont(Font.font("Helvetica", 45));
-                Text right = new Text("Right Ascension: " + h.get(searchID).RA + "°");
-
-                right.setFont(Font.font("Helvetica", 30));
-                vbox1.getChildren().add(id_disp);
-                vbox1.getChildren().add(right);
-
-              }
-
-              if (dec.isSelected()) {
-
-                Text decl = new Text("Declination: " + h.get(searchID).DEC + "°");
-
-                decl.setFont(Font.font("Helvetica", 30));
-
-                vbox1.getChildren().add(decl);
-
-              }
-
-              if (hflux.isSelected()) {
-
-                Text horiz =
-                    new Text("Hard-Band Flux: " + h.get(searchID).HARD_FLUX + " cm^(-2) sec^(-1)");
-
-                horiz.setFont(Font.font("Helvetica", 30));
-
-                vbox1.getChildren().add(horiz);
-
-              }
-
-              if (sflux.isSelected()) {
-
-                Text soft =
-                    new Text("Soft-Band Flux: " + h.get(searchID).SOFT_FLUX + " cm^(-2) sec^(-1)");
-
-                soft.setFont(Font.font("Helvetica", 30));
-
-                vbox1.getChildren().add(soft);
-
-              }
-
-              if (z.isSelected()) {
-
-                Text zee = new Text("Redshift: " + h.get(searchID).Z);
-
-                zee.setFont(Font.font("Helvetica", 30));
-
-                vbox1.getChildren().add(zee);
-
-              }
-
-              if (rmag.isSelected()) {
-
-                Text mag = new Text("R-Band Magnitude: " + h.get(searchID).RMAG);
-
-                mag.setFont(Font.font("Helvetica", 30));
-
-                vbox1.getChildren().add(mag);
-
-              }
-
-
-
-              Scene dialogScene = new Scene(vbox1, 800, 500);
-
-              disp.setScene(dialogScene);
-
-              disp.setTitle("Display");
-
-              disp.show();
-
-            } catch (NumberFormatException f) {
-
-              Alert invalidFile = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
-
-              invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-
-            }
-
-          }
-
-
-
-        });
-    FileChooser chooser = new FileChooser();
-    addSource.setOnAction(e -> {
-      File selectedFile = chooser.showOpenDialog(primaryStage);
-      if (selectedFile.getName()
-          .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
-          .equals(".json")) {
-        primaryStage.setScene(scene2);
-      } else {
-        Alert invalidFile =
-            new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
-        invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-      }
-    });
-    write.setOnAction(e -> {
-      fileToWriteTo = enterFileName.getText().trim();
-      try {
-        writeToFile(fileToWriteTo);
-      } catch (IOException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
-      primaryStage.setScene(scene3);
-    });
-    HBox botRight = new HBox(write, enterFileName);
-
-    HBox botButtons = new HBox(addSource, display, botRight, exit);
-    botButtons.setSpacing(50);
-    botButtons.setAlignment(Pos.CENTER);
-    botButtons.setTranslateY(-30);
-    pane.setBottom(botButtons);
-  }
-
-  private void inputTopPaneScreen3(BorderPane bp) {
-
-    Label top = new Label("Successfully written data to file");
-    top.setFont((Font.font("Helvetica", FontWeight.BOLD, 36)));
-    top.setTextFill(Color.WHITE);
-
-    bp.setTop(top);
-  }
-
-  private boolean writeToFile(String fileName) throws IOException {
-    File file = new File("c://temp//testFile1.txt");
-
-    // Create the file
-    if (file.createNewFile()) {
-      System.out.println("File is created!");
-    } else {
-      System.out.println("File already exists.");
-    }
-
-    // Write Content
-    FileWriter writer = new FileWriter(file);
-    writer.write("Test data");
-    writer.close();
-    return true;
-  }
-
-  private void inputBottomPaneScreen3(BorderPane bp, Stage primaryStage) {
-    Button quit = new Button("Quit");
-    quit.setFont(Font.font("Helvetica", 40));
-    Button open = new Button("Open New File");
-    open.setFont(Font.font("Helvetica", 40));
-    Button back = new Button("Back to Input Page");
-    back.setFont(Font.font("Helvetica", 40));
-    Image home = new Image("file:Home.png");
-    ImageView homeView = new ImageView(home);
-    homeView.setFitHeight(60);
-    homeView.setFitWidth(60);
-    Button mainMenu = new Button(null, homeView);
-
-    quit.setOnAction(e -> {
-      primaryStage.setScene(scene4);
-    });
-    FileChooser chooser = new FileChooser();
-    open.setOnAction(e -> {
-      File selectedFile = chooser.showOpenDialog(primaryStage);
-      if (selectedFile.getName()
-          .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
-          .equals(".json")) {
-        primaryStage.setScene(scene2);
-      } else {
-        Alert invalidFile =
-            new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
-        invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-      }
-    });
-    back.setOnAction(e -> {
-      primaryStage.setScene(scene2);
-    });
-    mainMenu.setOnAction(e -> {
-      primaryStage.setScene(scene1);
-    });
-
-    VBox bottom = new VBox(quit, open, back, mainMenu);
-    bottom.setSpacing(50);
-    bottom.setTranslateX(+30);
-    bottom.setTranslateY(-30);
-    bp.setBottom(bottom);
-  }
-
-  private void checkall(CheckBox ra, CheckBox dec, CheckBox hflux, CheckBox sflux, CheckBox z,
-      CheckBox rmag, CheckBox all) {
-    if (all.isSelected()) {
-      if (!ra.isSelected()) {
-        ra.fire();
-      }
-      if (!dec.isSelected()) {
-        dec.fire();
-      }
-      if (!hflux.isSelected()) {
-        hflux.fire();
-      }
-      if (!sflux.isSelected()) {
-        sflux.fire();
-      }
-      if (!z.isSelected()) {
-        z.fire();
-      }
-      if (!rmag.isSelected()) {
-        rmag.fire();
-      }
-    } else {
-      if (ra.isSelected()) {
-        ra.fire();
-      }
-      if (dec.isSelected()) {
-        dec.fire();
-      }
-      if (hflux.isSelected()) {
-        hflux.fire();
-      }
-      if (sflux.isSelected()) {
-        sflux.fire();
-      }
-      if (z.isSelected()) {
-        z.fire();
-      }
-      if (rmag.isSelected()) {
-        rmag.fire();
-      }
-    }
-  }
-
-  private void idParameters(BorderPane pane) {
-
-  }
-
-  private void idLookUp(BorderPane pane) {
-    TextField enterID = new TextField();
-    enterID.setPromptText("Enter ID");
-    Label label1 = new Label("ID: ");
-    label1.setTextFill(Color.WHITE);
-    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
-    HBox hb = new HBox(label1, enterID);
-    hb.setAlignment(Pos.TOP_RIGHT);
-    pane.setRight(hb);
-  }
-
-  @Override
-  public void start(Stage primaryStage) {
-    try {
-      scene1 = screen1Setup(primaryStage);
-      scene2 = screen2Setup(primaryStage);
-      scene3 = screen3Setup(primaryStage);
-      scene4 = screen4Setup();
-
-      scene1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-      scene2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-      scene3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-      scene4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-      primaryStage.setScene(scene1);
-      primaryStage.show();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static void main(String[] args) throws FileNotFoundException, IOException, ParseException,
-      org.json.simple.parser.ParseException {
-    h = new Hashtable<Integer, SourceObject>();
-    types = new ArrayList<String>();
-    fileRead = false;
-    IDsAdded = 0;
-    System.out.println(System.getProperty("user.dir"));
-    // parseJSON("./astroexample1.json");
-    // System.out.println("Test: ");
-    // System.out.println("Source 2 z is: " + h.get(2).Z + ", should be " + 1.90);
-    launch(args);
-  }
+	// hash table stores SourceObjects, indexing starts at 1
+	private static Hashtable<Integer, SourceObject> h;
+	// hash table stores SourceObjects to write to a file, indexing starts at 1
+	private static Hashtable<Integer, SourceObject> dataToWrite;
+	// Scene objects store each scene (page) of GUI
+	private static Scene scene1, scene2, scene3, scene4;
+	// types stores the type of each SourceObject in the hashtable
+	private static ArrayList<String> types;
+	// flag to tell if file has been read in yet
+	private static boolean fileRead;
+
+	private static int IDsAdded;
+
+	final private static String[] params = new String[] { "ID", "Right Ascension", "Declination", "Hard-Band Flux",
+			"Soft-Band Flux", "Redshift", "R-Band Magnitude" };
+
+	/**
+	 * @param filepath
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws org.json.simple.parser.ParseException
+	 * @throws org.json.simple.parser.ParseException
+	 */
+	private static void parseJSON(String filepath)
+			throws IOException, ParseException, org.json.simple.parser.ParseException {
+		// astroexample1
+		FileReader f = new FileReader(filepath);
+		// first, parse JSON file given the file path
+		Object obj = new JSONParser().parse(f);
+		// then create a JSON Object to represent file
+		JSONObject jo = (JSONObject) obj;
+		// create JSONArray to represent vertices from JSON file
+		JSONArray packages = (JSONArray) jo.get("SSA22Field");
+		// SSA22_Field
+		// iterate though all vertices (packages)
+
+		for (int i = 0; i < packages.size(); i++) {
+			// create JSONObject to hold given package
+			JSONObject jsonPackage = (JSONObject) packages.get(i);
+			// look for/ save the name info for given package (vertex name)
+
+			String type = (String) jsonPackage.get("type");
+			// System.out.println(type);
+			if (type != null) {
+				types.add(type.toString());
+			}
+			// create a JSONArray object to store the dependencies of the given package
+			// this is the same as the edges of this given vertex
+			JSONArray array = (JSONArray) jsonPackage.get("parameterArray");
+			// create a String[] array large enough to store these dependencies
+			String[] params = new String[array.size()];
+			JSONObject idpar = (JSONObject) array.get(0);
+			String id = (String) idpar.get("id");
+			int ide = Integer.parseInt(id);
+			// System.out.println("ID: " + id);
+			// iterate through the JSON array
+
+			for (int j = 0; j < array.size(); j++) {
+				// copy the package/ vertex names into String[] array
+				params[j] = (String) array.get(j).toString();
+
+				// System.out.println(params[j]);
+
+			}
+			double rightasc = 0;
+			JSONObject ras = (JSONObject) array.get(1);
+			String right = (String) ras.get("ra");
+			if (right.length() > 0) {
+				rightasc = Double.parseDouble((String) right);
+			}
+
+			double decl = 0;
+			JSONObject decc = (JSONObject) array.get(2);
+			String dec = (String) decc.get("dec");
+			if (dec.length() > 0) {
+				decl = Double.parseDouble((String) dec);
+			}
+
+			double hard = 0;
+			JSONObject ha = (JSONObject) array.get(3);
+			String hardf = (String) ha.get("hflux");
+			if (hardf.length() > 0) {
+				hard = Double.parseDouble(hardf);
+			}
+
+			double soft = 0;
+			JSONObject sof = (JSONObject) array.get(4);
+			String softf = (String) sof.get("sflux");
+			if (softf.length() > 0) {
+				soft = Double.parseDouble((String) softf);
+			}
+
+			double z = 0;
+			JSONObject redshift = (JSONObject) array.get(5);
+			String redz = (String) redshift.get("z");
+			if (redz.length() > 0) {
+				z = Double.parseDouble(redz);
+			}
+
+			double rmagnit = 0;
+			JSONObject rmag = (JSONObject) array.get(6);
+			String rmagn = (String) rmag.get("rmag");
+			if (rmagn.length() > 0) {
+				rmagnit = Double.parseDouble((String) rmagn);
+			}
+
+			SourceObject so = new SourceObject(ide, rightasc, decl, hard, soft, z, rmagnit);
+
+			h.put(ide, so);
+		}
+	}
+
+	private Scene screen1Setup(Stage primaryStage) {
+		BorderPane mainMenu = new BorderPane();
+
+		Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
+		mainMenu.setBackground(new Background(
+				new BackgroundImage(bg, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
+						new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
+		Image power = new Image("file:Power.png");
+		ImageView powerView = new ImageView(power);
+		powerView.setFitHeight(60);
+		powerView.setFitWidth(60);
+		Button powerButton = new Button(null, powerView);
+		mainMenu.setRight(powerButton);
+		Text title = new Text("Astronomical Catalog Data Receiver");
+		title.setFont(Font.font("Helvetica", 48));
+		title.setFill(Color.WHITE);
+		TextFlow titleBox = new TextFlow(title);
+		titleBox.setTextAlignment(TextAlignment.CENTER);
+		mainMenu.setTop(titleBox);
+		Button fileChooser = new Button("Select File");
+		fileChooser.setFont(Font.font("Helvetica", 42));
+		mainMenu.setCenter(fileChooser);
+		Button recentFile = new Button("Read most recent file");
+		recentFile.setFont(Font.font("Helvetica", 36));
+		Button recentID = new Button("Read all data from most recent ID");
+		recentID.setFont(Font.font("Helvetica", 36));
+		Button skipLoad = new Button("Skip File Selection");
+		skipLoad.setFont(Font.font("Helvetica", 36));
+		VBox bottomRight = new VBox(skipLoad, recentFile, recentID);
+		bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+		bottomRight.setSpacing(25);
+		bottomRight.setTranslateY(-20);
+		mainMenu.setBottom(bottomRight);
+
+		FileChooser chooser = new FileChooser();
+		fileChooser.setOnAction(e -> {
+			File selectedFile = chooser.showOpenDialog(primaryStage);
+			System.out.println(selectedFile.getName());
+			if (selectedFile.getName().substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
+					.equals(".json")) {
+				try {
+					fileRead = true;
+					parseJSON("./" + selectedFile.getName() + "");
+
+					scene2 = screen2Setup(primaryStage);
+					primaryStage.setScene(scene2);
+
+				} catch (IOException e1) {
+
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (org.json.simple.parser.ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			} else {
+				Alert invalidFile = new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
+				invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+			}
+		});
+		recentFile.setOnAction(e -> {
+			primaryStage.setScene(scene3);
+		});
+		recentID.setOnAction(e -> {
+			primaryStage.setScene(scene3);
+		});
+		powerButton.setOnAction(e -> {
+			primaryStage.setScene(scene4);
+			PauseTransition delay = new PauseTransition(Duration.seconds(1.25));
+			delay.setOnFinished(event -> Platform.exit());
+			delay.play();
+		});
+		skipLoad.setOnAction(e -> {
+			primaryStage.setScene(scene2);
+		});
+
+		return new Scene(mainMenu, 1200, 800);
+	}
+
+	private Scene screen2Setup(Stage primaryStage) {
+		BorderPane s2bp = new BorderPane();
+		Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
+		s2bp.setBackground(new Background(
+				new BackgroundImage(bg, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
+						new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
+		inputIDlist(s2bp);
+		inputRightPaneScreen2(s2bp, primaryStage);
+		return new Scene(s2bp, 1200, 800);
+
+	}
+
+	private Scene screen3Setup(Stage primaryStage) {
+		BorderPane results = new BorderPane();
+		Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
+		results.setBackground(new Background(
+				new BackgroundImage(bg, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
+						new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
+		inputTopPaneScreen3(results);
+		inputBottomPaneScreen3(results, primaryStage);
+		return new Scene(results, 1200, 800);
+	}
+
+	private Scene screen4Setup() {
+		BorderPane pane = new BorderPane();
+		Text text1 = new Text("Thank you for using \n      our program!");
+		text1.setFill(Color.WHITE);
+		text1.setFont(Font.font("Helvetica", FontWeight.BOLD, 40));
+		Text text2 = new Text("Now exiting...");
+		text2.setFill(Color.WHITE);
+		text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
+
+		VBox bottomRight = new VBox(text2);
+		bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+
+		pane.setCenter(text1);
+		pane.setPrefSize(500, 300);
+		pane.setBottom(bottomRight);
+
+		Image image = new Image("file:hs-1996-01-a-large_web.jpg");
+
+		Scene exitScene = new Scene(pane, 1200, 800);
+		BackgroundImage back = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT,
+				BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+		pane.setBackground(new Background(back));
+		return exitScene;
+	}
+
+	/**
+	 * This method adds the list of source IDs to the GUI
+	 * 
+	 * @param bp
+	 */
+	private void inputIDlist(BorderPane bp) {
+		ArrayList<String> ids = new ArrayList<String>();
+		ListView<Text> list = new ListView<Text>();
+		Label listId = new Label("Source ID List");
+		listId.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
+		ObservableList<Text> items = FXCollections.observableArrayList();
+		if (h.get(1) != null)
+			System.out.println(h.get(1).ID);
+		for (Integer i : h.keySet()) {
+			// add id items
+			items.add(new Text("" + h.get(h.size() - i + 1).ID + ", Type: " + types.get(types.size() - i)));
+		}
+		// + types.get(types.size() -i)
+		listId.setTextFill(Color.WHITE);
+		list.setItems(items);
+
+		bp.setTop(listId);
+		for (Text t : list.getItems()) {
+			t.setFont((Font.font("Helvetica", FontWeight.BOLD, 20)));
+			// (Font.font("Helvetica", FontWeight.BOLD, 24));
+		}
+		bp.setLeft(list);
+
+		// vbox.setBackground(new Background(new BackgroundFill(Color.WHITE,
+		// CornerRadii.EMPTY,
+		// Insets.EMPTY)));
+	}
+
+	private void inputRightPaneScreen2(BorderPane pane, Stage primaryStage) {
+		TextField enterID = new TextField();
+		enterID.setPromptText("Enter Valid ID");
+		Label label1 = new Label("Search ID: ");
+
+		label1.setTextFill(Color.WHITE);
+		label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
+		Label labelParams = new Label("Select Parameters: ");
+		labelParams.setTextFill(Color.WHITE);
+		labelParams.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
+		HBox hb = new HBox(new VBox(label1, new Label(""), labelParams),
+				new VBox(enterID, new Label(""), new Label("")));
+		hb.setAlignment(Pos.BOTTOM_RIGHT);
+
+		CheckBox ra = new CheckBox("Right Ascension");
+		ra.setTextFill(Color.WHITE);
+		ra.setFont(Font.font("Helvetica", 24));
+		CheckBox dec = new CheckBox("Declination");
+		dec.setTextFill(Color.WHITE);
+		dec.setFont(Font.font("Helvetica", 24));
+		CheckBox hflux = new CheckBox("Hard-Band Flux");
+		hflux.setTextFill(Color.WHITE);
+		hflux.setFont(Font.font("Helvetica", 24));
+		CheckBox sflux = new CheckBox("Soft-Band Flux");
+		sflux.setTextFill(Color.WHITE);
+		sflux.setFont(Font.font("Helvetica", 24));
+		CheckBox z = new CheckBox("Redshift");
+		z.setTextFill(Color.WHITE);
+		z.setFont(Font.font("Helvetica", 24));
+		CheckBox rmag = new CheckBox("R-Band Magnitude");
+		rmag.setTextFill(Color.WHITE);
+		rmag.setFont(Font.font("Helvetica", 24));
+		CheckBox all = new CheckBox("Select All");
+		all.setTextFill(Color.WHITE);
+		all.setFont(Font.font("Helvetica", 24));
+
+		VBox first = new VBox(ra, dec, hflux);
+		first.setSpacing(100);
+		VBox sec = new VBox(sflux, z, rmag);
+		sec.setSpacing(100);
+		HBox boxes = new HBox(first, sec);
+		boxes.setSpacing(30);
+
+		VBox moreboxes = new VBox(hb, boxes, all);
+		moreboxes.setSpacing(100);
+		moreboxes.setTranslateX(-20);
+		moreboxes.setTranslateY(10);
+		moreboxes.setAlignment(Pos.TOP_CENTER);
+		pane.setRight(moreboxes);
+		all.setOnAction(e -> checkall(ra, dec, hflux, sflux, z, rmag, all));
+		// bottom buttons
+		Button addSource = new Button("Add Source");
+		addSource.setFont(Font.font("Helvetica", 18));
+		Button display = new Button("Display Source Data");
+		display.setFont(Font.font("Helvetica", 18));
+		Button write = new Button("Write");
+		write.setFont(Font.font("Helvetica", 18));
+
+		display.setOnAction(e -> {
+			if (fileRead) {
+				try {
+					int id_to_search = Integer.parseInt(enterID.getText());
+					dataToWrite.put(id_to_search, h.get(id_to_search));
+				} catch (NumberFormatException f) {
+					Alert invalidFile = new Alert(Alert.AlertType.INFORMATION, "Please enter an integer");
+					invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+				}
+			}
+		});
+		addSource.setOnAction(e -> {
+			popupAddScreen2(primaryStage);
+		});
+		write.setOnAction(e -> {
+			primaryStage.setScene(scene3);
+		});
+
+		HBox botButtons = new HBox(addSource, display, write);
+		botButtons.setSpacing(100);
+		botButtons.setAlignment(Pos.CENTER);
+		botButtons.setTranslateY(-30);
+		pane.setBottom(botButtons);
+	}
+
+	private void popupAddScreen2(Stage primaryStage) {
+		primaryStage.setTitle("Creating popup");
+
+		Stage popup = new Stage();
+		popup.initModality(Modality.APPLICATION_MODAL);
+		popup.initOwner(primaryStage);
+
+		VBox leftVbox = new VBox(20);
+		Label type = new Label("Select Type:");
+		type.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+		ObservableList<String> options = FXCollections
+				.observableArrayList(types.stream().distinct().collect(Collectors.toList()));
+		ComboBox<String> c = new ComboBox<String>(options);
+		VBox typeBox = new VBox(5);
+		typeBox.getChildren().addAll(type, c);
+		leftVbox.getChildren().add(typeBox);
+		for (int i = 1; i < params.length - 3; i++) {
+			VBox temp = new VBox(10);
+			TextField tf = new TextField();
+			tf.setPromptText(params[i]);
+			Label l = new Label(params[i] + ":");
+			l.setTextFill(Color.BLACK);
+			l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+			temp.getChildren().addAll(l, tf);
+			leftVbox.getChildren().add(temp);
+		}
+		leftVbox.setTranslateX(10);
+
+		VBox centerVbox = new VBox(20);
+		for (int i = params.length - 3; i < params.length; i++) {
+			VBox temp = new VBox(10);
+			TextField tf = new TextField();
+			tf.setPromptText(params[i]);
+			tf.setMaxWidth(157);
+			Label l = new Label(params[i] + ":");
+			l.setTextFill(Color.BLACK);
+			l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+			temp.getChildren().addAll(l, tf);
+			centerVbox.getChildren().add(temp);
+		}
+		centerVbox.setAlignment(Pos.BASELINE_CENTER);
+		centerVbox.setTranslateY(37);
+		centerVbox.setTranslateX(100);
+
+		HBox bottomHbox = new HBox(20);
+		Button addSource = new Button("Add Source");
+		addSource.setFont(Font.font("Helvetica", 20));
+		Button addAndExit = new Button("Add Source and Exit");
+		addAndExit.setFont(Font.font("Helvetica", 20));
+		Button exit = new Button("Exit");
+		exit.setFont(Font.font("Helvetica", 20));
+		bottomHbox.getChildren().addAll(addSource, addAndExit, exit);
+		bottomHbox.setAlignment(Pos.BOTTOM_CENTER);
+		bottomHbox.setTranslateY(-10);
+
+		BorderPane bp = new BorderPane();
+		bp.setLeft(leftVbox);
+		bp.setCenter(centerVbox);
+		bp.setBottom(bottomHbox);
+		Scene popupScene = new Scene(bp, 600, 400);
+		popup.setScene(popupScene);
+		popup.show();
+
+		addSource.setOnAction(e -> {
+			String[][] pVals = new String[2][4];
+
+			pVals[0] = popupVboxIterator(leftVbox);
+			pVals[1] = popupVboxIterator(centerVbox);
+			
+			SourceObject s = null;
+			try {
+			s = popupSourceObject(pVals);
+			h.put(types.size() + 1, s);
+			if(pVals[0][0].equals("null")) {
+				throw new NullPointerException();
+			}
+			types.add(pVals[0][0]);
+			scene2 = screen2Setup(primaryStage);
+			primaryStage.setScene(scene2);
+			}
+			catch(NullPointerException np) {
+				h.remove(types.size() + 1, s);
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+			}
+			catch(NumberFormatException nf) {
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+			}
+		});
+
+		addAndExit.setOnAction(e -> {
+			String[][] pVals = new String[2][4];
+
+			pVals[0] = popupVboxIterator(leftVbox);
+			pVals[1] = popupVboxIterator(centerVbox);
+			
+			boolean exception = false;
+			SourceObject s = null;
+			try {
+			s = popupSourceObject(pVals);
+			h.put(types.size() + 1, s);
+			if(pVals[0][0].equals("null")) {
+				throw new NullPointerException();
+			}
+			types.add(pVals[0][0]);
+			scene2 = screen2Setup(primaryStage);
+			primaryStage.setScene(scene2);
+			}
+			catch(NullPointerException np) {
+				h.remove(types.size() + 1, s);
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+				exception = true;
+			}
+			catch(NumberFormatException nf) {
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+				exception = true;
+			}
+			
+			if(!exception) {
+				popup.close();
+			}
+		});
+
+		exit.setOnAction(e -> {
+			popup.close();
+		});
+
+	}
+
+	private String[] popupVboxIterator(VBox top) {
+		String[] arr = new String[4];
+		int i = 1;
+		for (Node v : top.getChildren()) {
+			if (v instanceof VBox) {
+				VBox vb = (VBox) v;
+				for (Node n : vb.getChildren()) {
+					if (n instanceof ComboBox) {
+						ComboBox<String> cb = (ComboBox<String>) n;
+						arr[0] = cb.getValue();
+					} else if (n instanceof TextField) {
+						TextField t = (TextField) n;
+						arr[i] = t.getText();
+						i++;
+					}
+				}
+			}
+		}
+		return arr;
+	}
+
+	private SourceObject popupSourceObject(String[][] arr) throws NumberFormatException {
+		double[][] pVals = new double[2][4];
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = 1; j < arr.length; j++) {
+				pVals[i][j] = Double.parseDouble(arr[i][j]);
+			}
+		}
+		
+		SourceObject so = new SourceObject(types.size() + 1, pVals[0][1], pVals[0][2], pVals[0][3], pVals[1][1],
+				pVals[1][2], pVals[1][3]);
+		
+		return so;
+	}
+
+	private void inputTopPaneScreen3(BorderPane bp) {
+		Label top = new Label("ERROR R2-3P0: NO BACKEND");
+		top.setFont((Font.font("Helvetica", FontWeight.BOLD, 36)));
+		top.setTextFill(Color.RED);
+
+		bp.setTop(top);
+	}
+
+	private void inputBottomPaneScreen3(BorderPane bp, Stage primaryStage) {
+		Button quit = new Button("Quit");
+		quit.setFont(Font.font("Helvetica", 40));
+		Button open = new Button("Open New File");
+		open.setFont(Font.font("Helvetica", 40));
+		Button back = new Button("Back to Input Page");
+		back.setFont(Font.font("Helvetica", 40));
+		Image home = new Image("file:Home.png");
+		ImageView homeView = new ImageView(home);
+		homeView.setFitHeight(60);
+		homeView.setFitWidth(60);
+		Button mainMenu = new Button(null, homeView);
+
+		quit.setOnAction(e -> {
+			primaryStage.setScene(scene4);
+			PauseTransition delay = new PauseTransition(Duration.seconds(1.25));
+			delay.setOnFinished(event -> Platform.exit());
+			delay.play();
+		});
+		FileChooser chooser = new FileChooser();
+		open.setOnAction(e -> {
+			File selectedFile = chooser.showOpenDialog(primaryStage);
+			if (selectedFile.getName().substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
+					.equals(".json")) {
+				primaryStage.setScene(scene2);
+			} else {
+				Alert invalidFile = new Alert(Alert.AlertType.INFORMATION, "Incorrect File Type, Choose a .json file");
+				invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+			}
+		});
+		back.setOnAction(e -> {
+			primaryStage.setScene(scene2);
+		});
+		mainMenu.setOnAction(e -> {
+			primaryStage.setScene(scene1);
+		});
+
+		VBox bottom = new VBox(quit, open, back, mainMenu);
+		bottom.setSpacing(50);
+		bottom.setTranslateX(+30);
+		bottom.setTranslateY(-30);
+		bp.setBottom(bottom);
+	}
+
+	private void checkall(CheckBox ra, CheckBox dec, CheckBox hflux, CheckBox sflux, CheckBox z, CheckBox rmag,
+			CheckBox all) {
+		if (all.isSelected()) {
+			if (!ra.isSelected()) {
+				ra.fire();
+			}
+			if (!dec.isSelected()) {
+				dec.fire();
+			}
+			if (!hflux.isSelected()) {
+				hflux.fire();
+			}
+			if (!sflux.isSelected()) {
+				sflux.fire();
+			}
+			if (!z.isSelected()) {
+				z.fire();
+			}
+			if (!rmag.isSelected()) {
+				rmag.fire();
+			}
+		} else {
+			if (ra.isSelected()) {
+				ra.fire();
+			}
+			if (dec.isSelected()) {
+				dec.fire();
+			}
+			if (hflux.isSelected()) {
+				hflux.fire();
+			}
+			if (sflux.isSelected()) {
+				sflux.fire();
+			}
+			if (z.isSelected()) {
+				z.fire();
+			}
+			if (rmag.isSelected()) {
+				rmag.fire();
+			}
+		}
+	}
+
+	private void idParameters(BorderPane pane) {
+
+	}
+
+	private void idLookUp(BorderPane pane) {
+		TextField enterID = new TextField();
+		enterID.setPromptText("Enter ID");
+		Label label1 = new Label("ID: ");
+		label1.setTextFill(Color.WHITE);
+		label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
+		HBox hb = new HBox(label1, enterID);
+		hb.setAlignment(Pos.TOP_RIGHT);
+		pane.setRight(hb);
+	}
+
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+			scene1 = screen1Setup(primaryStage);
+			scene2 = screen2Setup(primaryStage);
+			scene3 = screen3Setup(primaryStage);
+			scene4 = screen4Setup();
+
+			scene1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+			primaryStage.setScene(scene1);
+			primaryStage.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args)
+			throws FileNotFoundException, IOException, ParseException, org.json.simple.parser.ParseException {
+		h = new Hashtable<Integer, SourceObject>();
+		types = new ArrayList<String>();
+		fileRead = false;
+		System.out.println(System.getProperty("user.dir"));
+		// parseJSON("./astroexample1.json");
+		// System.out.println("Test: ");
+		// System.out.println("Source 2 z is: " + h.get(2).Z + ", should be " + 1.90);
+		launch(args);
+	}
 
 }
