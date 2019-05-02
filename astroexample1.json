@@ -1,7 +1,7 @@
 { "SSA22Field": 
     [
         {
-        "type": "AGN",
+        "type":"AGN",
         "image":"none",
         "parameterArray": [
             {"id": "1"},
@@ -14,7 +14,7 @@
         ]
         },
         {
-        "type": "STF",
+        "type":"Star-Forming",
         "image":"none",
         "parameterArray": [
             {"id": "2"},
@@ -27,7 +27,7 @@
         ]
         }, 
         {
-        "type": "DWARF",
+        "type":"Dwarf Galaxy",
         "image":"none",
         "parameterArray": [
             {"id": "3"},
@@ -39,9 +39,8 @@
             {"rmag": "26.00"}
         ]
         },
-        , 
         {
-        "type": "AGN",
+        "type":"AGN",
         "image":"none",
         "parameterArray": [
             {"id": "4"},
@@ -54,7 +53,7 @@
         ]
         },
         {
-        "type": "AGN",
+        "type":"AGN",
         "image":"none",
         "parameterArray": [
             {"id": "5"},
@@ -67,7 +66,7 @@
         ]
         },
         {
-        "type": "STF",
+        "type":"Star-Forming",
         "image":"none",
         "parameterArray": [
             {"id": "6"},
@@ -80,7 +79,7 @@
         ]
         },
         {
-        "type": "STF",
+        "type":"Unknown",
         "image":"none",
         "parameterArray": [
             {"id": "7"},
@@ -93,7 +92,7 @@
         ]
         },
         {
-        "type": "STAR",
+        "type":"Star",
         "image":"none",
         "parameterArray": [
             {"id": "8"},
@@ -106,7 +105,7 @@
         ]
         },
         {
-        "type": "AGN",
+        "type":"AGN",
         "image":"none",
         "parameterArray": [
             {"id": "9"},
@@ -119,7 +118,7 @@
         ]
         },
         {
-        "type": "STF",
+        "type":"Star-Forming",
         "image":"none",
         "parameterArray": [
             {"id": "10"},
@@ -129,6 +128,32 @@
             {"sflux": "0.83e-16"},
             {"z": "4.08"},
             {"rmag": "26.95"}
+        ]
+        },
+        {
+        "type":"Dwarf Galaxy",
+        "image":"none",
+        "parameterArray": [
+            {"id": "11"},
+            {"ra": "333.62"},
+            {"dec": "2.53"},
+            {"hflux": ""},
+            {"sflux": "9.83e-16"},
+            {"z": "3.97"},
+            {"rmag": "26.45"}
+        ]
+        },
+        {
+        "type":"Unknown",
+        "image":"none",
+        "parameterArray": [
+            {"id": "12"},
+            {"ra": "333.62"},
+            {"dec": "2.53"},
+            {"hflux": "4.12e-14"},
+            {"sflux": "8.48e-15"},
+            {"z": ""},
+            {"rmag": "24.75"}
         ]
         }
      ]    
