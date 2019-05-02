@@ -382,7 +382,8 @@ public class Main extends Application {
     CheckBox all = new CheckBox("Select All");
     all.setTextFill(Color.WHITE);
     all.setFont(Font.font("Helvetica", 24));
-
+    Button help = new Button("Help");
+    help.setFont(Font.font("Helvetica", 18));
     VBox first = new VBox(ra, dec, hflux);
     first.setSpacing(100);
     VBox sec = new VBox(sflux, z, rmag);
@@ -411,35 +412,15 @@ public class Main extends Application {
     enterFileName.setPromptText("Enter File Name");
     
     
-    Button help = new Button("Help");
-    help.setOnAction(e -> 
-           try {
-              final Stage helpPop = new Stage();
-              helpPop.initModality(Modality.APPLICATION_MODAL);
-              helpPop.initOwner(primaryStage);   
-              Label helpLabel = new Label("Help");
-              TextArea helpText = new TextArea("How to operate the program:\n"
-              +" There are many options that you have for going through the data\n"
-              +"that you read in from the file given.\n"
-              +"\n" +
-              "To add a new source, click the add button and add the preferred data\n"
-              +"to the popup window that appears.\n"
-              +"\n"+
-              "To display data, check the correct data that is desired from the checkboxes\n"
-              +"on the right and then click on the display button. A popup will appear, and\n"
-              +"if wanted, the data displayed can be saved to be written to another file by\n"
-              +"clicking on the save and exit button.\n"+
-              "\n"+
-              "To write to another file, click on the write button. If there is a valid ID in\n"
-              "the text field, all the data from that specific source is written to a separate json file.\n
-              If there is no ID written in the text field, then all the data from the IDs on the \n
-              second list will be written to a separate json file.");
+    
+    help.setOnAction(e -> {
+    Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
+        "How to operate the program:\n There are many options that you have for going through the data\n that you read in from the file given.\nTo add a new source, click the add button and add the preferred data\n to the popup window that appears.\n To display data, check the correct data that is desired from the checkboxes\n on the right and then click on the display button. A popup will appear, and\n if wanted, the data displayed can be saved to be written to another file by\n clicking on the save and exit button.\n To write to another file, click on the write button. If there is a valid ID in\n the text field, all the data from that specific source is written to a separate json file.\n If there is no ID written in the text field, then all the data from the IDs on the\n second list will be written to a separate json file.");
+    invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+             
            
-           } catch (exception e) {
-              Alert helpError = new Alert(Alert.AlertType.INFORMATION, "Something went wrong when loading the help popup.");
-
-                    helpError.showAndWait().filter(response -> response == ButtonType.OK);
-           });
+           } );
+    
     exit.setOnAction(e -> {
       primaryStage.setScene(scene4);
     });
@@ -608,6 +589,7 @@ System.out.println("total IDs: " + IDsAdded);
               "Duplicate or invalid file, choose a .json file");
           invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
         } else {
+          scene3 = screen3Setup(primaryStage);
           primaryStage.setScene(scene3);
         }
       } catch (IOException e1) {
@@ -618,7 +600,7 @@ System.out.println("total IDs: " + IDsAdded);
     });
     HBox botRight = new HBox(write, enterFileName);
 
-    HBox botButtons = new HBox(addSource, display, botRight, exit);
+    HBox botButtons = new HBox(help, addSource, display, botRight, exit);
     botButtons.setSpacing(50);
     botButtons.setAlignment(Pos.CENTER);
     botButtons.setTranslateY(-30);
@@ -627,7 +609,7 @@ System.out.println("total IDs: " + IDsAdded);
 
   private void inputTopPaneScreen3(BorderPane bp) {
 
-    Label top = new Label("Successfully written " + IDsAdded + " IDs to a file");
+    Label top = new Label("Successfully written " + dataToWrite.size() + " IDs to a file");
     top.setFont((Font.font("Helvetica", FontWeight.BOLD, 36)));
     top.setTextFill(Color.WHITE);
 
@@ -823,7 +805,7 @@ System.out.println("total IDs: " + IDsAdded);
     types = new ArrayList<String>();
     dataToWrite = new Hashtable<Integer, SourceObject>();
     fileRead = false;
-    IDsAdded = 0;
+    
     System.out.println(System.getProperty("user.dir"));
     // parseJSON("./astroexample1.json");
     // System.out.println("Test: ");
