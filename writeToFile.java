@@ -57,3 +57,14 @@
 
       allSources.add(cursrc);
     }
+	
+	title.put("ModifiedAstronomicalData", allSources);
+    // Write JSON file
+    try (FileWriter files = new FileWriter(fileName)) {
+      files.write(title.toJSONString());
+      files.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
