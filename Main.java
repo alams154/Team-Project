@@ -1,3 +1,21 @@
+//////////////////// ALL ASSIGNMENTS INCLUDE THIS SECTION /////////////////////
+// Assignment name: Team Project - Astronomical Catalog Data Receiver
+// Due Date: 05/03/19
+// Title: Main.java
+// Files: application.css, SourceObject.java, astroexample1.json
+// Course: CS 400, Lec 001- Spring 2019
+//
+// Authors: Brandon Radzom, Sameer Alam, Dayton Lindsay, Jacob Hoeg
+// Email: radzom@wisc.edu
+// Lecturer's Name: Deb Deppler
+//
+// Known bugs: None
+///////////////////////////// CREDIT OUTSIDE HELP /////////////////////////////
+//
+// Persons: NONE
+// Online Sources: NONE
+//
+/////////////////////////////// 80 COLUMNS WIDE ///////////////////////////////
 package application;
 
 import java.awt.Desktop;
@@ -63,21 +81,23 @@ public class Main extends Application {
   private static ArrayList<String> types;
   // flag to tell if file has been read in yet
   private static boolean fileRead;
-
+  // int counter to keep track of the number of IDs added
   private static int IDsAdded;
-
+  // String representing the file name to write into
   private static String fileToWriteTo;
-
+  // JSONArray object to contain all data in source file
   private static JSONArray astroRegion;
-
+  // File object to hold reference of newly created file after writing
   private static File newFile;
-
+  // String array that contains the names of each source parameter
   final private static String[] params = new String[] {"ID", "Right Ascension", "Declination",
       "Hard-Band Flux", "Soft-Band Flux", "Redshift", "R-Band Magnitude"};
 
-  private static int averageDistance;
 
   /**
+   * This method takes in a path to a json file and parses it by saving its data to an internal
+   * hashTable structure
+   * 
    * @param filepath
    * @throws IOException
    * @throws ParseException
@@ -86,7 +106,7 @@ public class Main extends Application {
    */
   private static void parseJSON(String filepath)
       throws IOException, ParseException, org.json.simple.parser.ParseException {
-    // astroexample1
+    // creates a file reader for the specified file
     FileReader f = new FileReader(filepath);
     // first, parse JSON file given the file path
     Object obj = new JSONParser().parse(f);
@@ -94,80 +114,87 @@ public class Main extends Application {
     JSONObject jo = (JSONObject) obj;
     // create JSONArray to represent vertices from JSON file
     astroRegion = (JSONArray) jo.get("AstronomicalData");
-    // SSA22_Field
-    // iterate though all vertices (packages)
-
+    // iterate though all JSONArray objects
     for (int i = 0; i < astroRegion.size(); i++) {
-      // create JSONObject to hold given package
-      JSONObject jsonPackage = (JSONObject) astroRegion.get(i);
-      // look for/ save the name info for given package (vertex name)
-      String type = (String) jsonPackage.get("type");
-      // System.out.println(type);
+      // create JSONObject to hold given source
+      JSONObject jsonSrc = (JSONObject) astroRegion.get(i);
+      // save the type of given source in String
+      String type = (String) jsonSrc.get("type");
+      // store String in types array
       if (type != null) {
         types.add(type.toString());
       }
-      // create a JSONArray object to store the dependencies of the given package
-      // this is the same as the edges of this given vertex
-      JSONArray array = (JSONArray) jsonPackage.get("parameterArray");
-      // create a String[] array large enough to store these dependencies
+      // create a JSONArray object to store all parameters of given source
+      JSONArray array = (JSONArray) jsonSrc.get("parameterArray");
+      // create a String[] array large enough to store these parameters
       String[] params = new String[array.size()];
+      // save the id of the source
       JSONObject idpar = (JSONObject) array.get(0);
       String id = (String) idpar.get("id");
+      // convert id to Integer
       int ide = Integer.parseInt(id);
-      // System.out.println("ID: " + id);
-      // iterate through the JSON array
-
+      // iterate through the JSON parameter array
       for (int j = 0; j < array.size(); j++) {
-        // copy the package/ vertex names into String[] array
+        // save all the parameters
         params[j] = (String) array.get(j).toString();
 
-        // System.out.println(params[j]);
-
       }
+      // now go through and save each individual parameter
+
+      // save RA coordinates as a double
       double rightasc = 0;
+      // index 1 always has RA
       JSONObject ras = (JSONObject) array.get(1);
       String right = (String) ras.get("ra");
+      // save RA to double variable
       if (right.length() > 0) {
         rightasc = Double.parseDouble((String) right);
       }
 
+      // save DEC coordinates as a double
       double decl = 0;
+      // index 2 always has DEC
       JSONObject decc = (JSONObject) array.get(2);
       String dec = (String) decc.get("dec");
+      // save DEC to double
       if (dec.length() > 0) {
         decl = Double.parseDouble((String) dec);
       }
-
+      // save hard-band flux of source to double
       double hard = 0;
+      // H-flux always in index 3
       JSONObject ha = (JSONObject) array.get(3);
       String hardf = (String) ha.get("hflux");
       if (hardf.length() > 0) {
         hard = Double.parseDouble(hardf);
       }
-
+      // save soft-band flux of source to double
       double soft = 0;
+      // s-flux always in 4th index
       JSONObject sof = (JSONObject) array.get(4);
       String softf = (String) sof.get("sflux");
       if (softf.length() > 0) {
         soft = Double.parseDouble((String) softf);
       }
-
+      // save redshift of source to double
       double z = 0;
+      // redshift in index 5
       JSONObject redshift = (JSONObject) array.get(5);
       String redz = (String) redshift.get("z");
       if (redz.length() > 0) {
         z = Double.parseDouble(redz);
       }
-
+      // save r-band magnitude of source to double
       double rmagnit = 0;
+      // rmag always in index 6
       JSONObject rmag = (JSONObject) array.get(6);
       String rmagn = (String) rmag.get("rmag");
       if (rmagn.length() > 0) {
         rmagnit = Double.parseDouble((String) rmagn);
       }
-
+      // finally create new SourceObject with these given parameters
       SourceObject so = new SourceObject(ide, rightasc, decl, hard, soft, z, rmagnit);
-
+      // and put this source object in hashtable containing all data from file
       allData.put(ide, so);
     }
   }
@@ -194,13 +221,10 @@ public class Main extends Application {
     Button fileChooser = new Button("Select File");
     fileChooser.setFont(Font.font("Helvetica", 42));
     mainMenu.setCenter(fileChooser);
-    Button recentFile = new Button("Read most recent file");
-    recentFile.setFont(Font.font("Helvetica", 36));
-    Button recentID = new Button("Read all data from most recent ID");
-    recentID.setFont(Font.font("Helvetica", 36));
+
     Button skipLoad = new Button("Skip File Selection");
     skipLoad.setFont(Font.font("Helvetica", 36));
-    VBox bottomRight = new VBox(skipLoad, recentFile, recentID);
+    VBox bottomRight = new VBox(skipLoad);
     bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
     bottomRight.setSpacing(25);
     bottomRight.setTranslateY(-20);
@@ -209,7 +233,7 @@ public class Main extends Application {
     FileChooser chooser = new FileChooser();
     fileChooser.setOnAction(e -> {
       File selectedFile = chooser.showOpenDialog(primaryStage);
-      System.out.println(selectedFile.getName());
+
       if (selectedFile.getName()
           .substring(selectedFile.getName().length() - 5, selectedFile.getName().length())
           .equals(".json")) {
@@ -238,12 +262,7 @@ public class Main extends Application {
         invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
       }
     });
-    recentFile.setOnAction(e -> {
-      primaryStage.setScene(scene3);
-    });
-    recentID.setOnAction(e -> {
-      primaryStage.setScene(scene3);
-    });
+
     powerButton.setOnAction(e -> {
       primaryStage.setScene(scene4);
     });
@@ -254,59 +273,78 @@ public class Main extends Application {
     return new Scene(mainMenu, 1200, 800);
   }
 
+  /*
+   * Method that creates and supports the second screen, which is in charge of adding, displaying,
+   * and writing data
+   */
   private Scene screen2Setup(Stage primaryStage) {
-    BorderPane s2bp = new BorderPane();
+    BorderPane s2bp = new BorderPane(); // set up the boarderpane
+
+    // get and set up the background image
     Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
     s2bp.setBackground(new Background(new BackgroundImage(bg, BackgroundRepeat.REPEAT,
         BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
         new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
+    // call helper methods that set up the left and right sides of the screen
     inputIDlist(s2bp);
     inputRightPaneScreen2(s2bp, primaryStage);
+    // return the scene
     return new Scene(s2bp, 1200, 800);
-
   }
 
+  /*
+   * Method that creates the third screen, which is the screen that displays if the file was
+   * successfully written to
+   */
   private Scene screen3Setup(Stage primaryStage) {
-    BorderPane results = new BorderPane();
+    BorderPane results = new BorderPane(); // set up the border pane
+
+    // get and set up the background image
     Image bg = new Image("file:hs-1996-01-a-large_web.jpg");
     results.setBackground(new Background(new BackgroundImage(bg, BackgroundRepeat.REPEAT,
         BackgroundRepeat.REPEAT, BackgroundPosition.CENTER,
         new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false))));
+    // helper methods that set up components in the scene
+    // set top border pane
     inputTopPaneScreen3(results);
+    // set bottom border pane
     inputBottomPaneScreen3(results, primaryStage);
+    // return a newly created scene
     return new Scene(results, 1200, 800);
   }
 
-  /**
-   * @param s
-   * @return
+  /*
+   * Method that creates the fourth screen, which is the exit screen displayed when closing the
+   * program
    */
   private Scene screen4Setup(Stage s) {
-    BorderPane pane = new BorderPane();
+    BorderPane pane = new BorderPane(); // set up the border pane
+
+    // set up and edit the font of the text to appear on the screen
     Text text1 = new Text("Thank you for using \n      our program!");
     text1.setFill(Color.WHITE);
     text1.setFont(Font.font("Helvetica", FontWeight.BOLD, 40));
-    // Text text2 = new Text("Now exiting...");
-    // text2.setFill(Color.WHITE);
-    // text2.setFont(Font.font("Helvetica", FontPosture.ITALIC, 20));
+
+    // set up the exit button
     Button done = new Button("Close Program");
     done.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
-    // VBox bottomRight = new VBox(text2);
-    // bottomRight.setAlignment(Pos.BOTTOM_RIGHT);
+
+    // place the button and text on the screen
     pane.setRight(done);
     pane.setCenter(text1);
     pane.setPrefSize(500, 300);
-    // pane.setBottom(bottomRight);
 
+    // get and set up the background image
     Image image = new Image("file:hs-1996-01-a-large_web.jpg");
-
     Scene exitScene = new Scene(pane, 1200, 800);
     BackgroundImage back = new BackgroundImage(image, BackgroundRepeat.REPEAT,
         BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
     pane.setBackground(new Background(back));
+    // exit when button pressed
     done.setOnAction(e -> {
       s.close();
     });
+    // return the exit scene
     return exitScene;
   }
 
@@ -322,45 +360,33 @@ public class Main extends Application {
     listId.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
     ObservableList<Text> items = FXCollections.observableArrayList();
     if (allData.get(1) != null)
-      System.out.println(allData.get(1).getID());
-    for (Integer i : allData.keySet()) {
-      // add id items
-      items.add(new Text(
-          "" + (int) allData.get(allData.size() - i + 1).getID() + ", Type: " + types.get(types.size() - i)));
-    }
-    
+
+      for (Integer i : allData.keySet()) {
+        // add id items
+        items.add(new Text("" + (int) allData.get(allData.size() - i + 1).getID() + ", Type: "
+            + types.get(types.size() - i)));
+      }
+
     listId.setTextFill(Color.WHITE);
     list.setItems(items);
-    // HBox listCount = new HBox();
 
     bp.setTop(listId);
     for (Text t : list.getItems()) {
       t.setFont((Font.font("Helvetica", FontWeight.BOLD, 20)));
-      // (Font.font("Helvetica", FontWeight.BOLD, 24));
     }
-    // listCount.getChildren().add(list);
-    // VBox counter = new VBox();
-    // Label idCount = new Label("IDs saved:");
-    // idCount.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
-    // counter.getChildren().add(idCount);
-    // Text counts = new Text("" + IDsAdded);
-    // counter.getChildren().add(idCount);
-    // counter.getChildren().add(counts);
-    // listCount.getChildren().add(counter);
-    // bp.setLeft(listCount);
+
 
     ListView<Text> list2 = new ListView<Text>();
     Label savedList = new Label("Saved ID List");
     savedList.setFont((Font.font("Helvetica", FontWeight.BOLD, 24)));
     ObservableList<Text> savedItems = FXCollections.observableArrayList();
     if (dataToWrite.get(1) != null)
-      System.out.println(dataToWrite.get(1).getID());
-    for (Integer i : dataToWrite.keySet()) {
-      // add id items
-      savedItems.add(new Text(
-          "" + (int) dataToWrite.get(dataToWrite.size() - i + 1).getID() ));
-    }
-    
+
+      for (Integer i : dataToWrite.keySet()) {
+        // add id items
+        savedItems.add(new Text("" + (int) dataToWrite.get(dataToWrite.size() - i + 1).getID()));
+      }
+
     savedList.setTextFill(Color.WHITE);
     list2.setItems(savedItems);
     // HBox listCount = new HBox();
@@ -370,11 +396,11 @@ public class Main extends Application {
       t.setFont((Font.font("Helvetica", FontWeight.BOLD, 20)));
       // (Font.font("Helvetica", FontWeight.BOLD, 24));
     }
-    
+
     VBox leftBox = new VBox(listId, list);
     VBox rightBox = new VBox(savedList, list2);
     HBox mainBox = new HBox(leftBox, rightBox);
-    
+
     bp.setLeft(mainBox);
 
     // vbox.setBackground(new Background(new BackgroundFill(Color.WHITE,
@@ -405,22 +431,22 @@ public class Main extends Application {
         new VBox(enterID, new Label(""), new Label("")));
     hb.setAlignment(Pos.BOTTOM_RIGHT);
 
-    CheckBox ra = new CheckBox("Right Ascension");
+    CheckBox ra = new CheckBox(params[1]);
     ra.setTextFill(Color.WHITE);
     ra.setFont(Font.font("Helvetica", 24));
-    CheckBox dec = new CheckBox("Declination");
+    CheckBox dec = new CheckBox(params[2]);
     dec.setTextFill(Color.WHITE);
     dec.setFont(Font.font("Helvetica", 24));
-    CheckBox hflux = new CheckBox("Hard-Band Flux");
+    CheckBox hflux = new CheckBox(params[3]);
     hflux.setTextFill(Color.WHITE);
     hflux.setFont(Font.font("Helvetica", 24));
-    CheckBox sflux = new CheckBox("Soft-Band Flux");
+    CheckBox sflux = new CheckBox(params[4]);
     sflux.setTextFill(Color.WHITE);
     sflux.setFont(Font.font("Helvetica", 24));
-    CheckBox z = new CheckBox("Redshift");
+    CheckBox z = new CheckBox(params[5]);
     z.setTextFill(Color.WHITE);
     z.setFont(Font.font("Helvetica", 24));
-    CheckBox rmag = new CheckBox("R-Band Magnitude");
+    CheckBox rmag = new CheckBox(params[6]);
     rmag.setTextFill(Color.WHITE);
     rmag.setFont(Font.font("Helvetica", 24));
     CheckBox all = new CheckBox("Select All");
@@ -458,8 +484,9 @@ public class Main extends Application {
     Button average = new Button("Compute mean distance");
     average.setFont(Font.font("Helvetica", 18));
     average.setOnAction(e -> {
-      Alert meanDistance = new Alert(Alert.AlertType.INFORMATION,
-          "Mean Source Distance: " + getMeanDistance() + " cm");
+      String meanD = "" + getMeanDistance();
+      Alert meanDistance = new Alert(Alert.AlertType.INFORMATION, "Mean Source Distance: "
+          + meanD.substring(0, 6) + meanD.substring(meanD.length() - 3, meanD.length()) + " cm");
       meanDistance.showAndWait().filter(response -> response == ButtonType.OK);
     });
 
@@ -477,7 +504,7 @@ public class Main extends Application {
               + "and add a valid file name.\nInclude the .json at the end of the name "
               + "in order for the file to be created successfully. \nOnce clicked, all "
               + "sources (requested to save) from the second list will be written to a "
-              + "separate json file.");
+              + "separate json file saved to the current directory.");
       invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
 
 
@@ -499,17 +526,17 @@ public class Main extends Application {
               HBox saveExt = new HBox();
               VBox vbox1 = new VBox();
               int searchID = Integer.parseInt(enterID.getText().trim());
-              System.out.println("adding " + searchID + " to hash");
+
               dataToWrite.put(IDsAdded + 1, allData.get(searchID));
               IDsAdded++;
-              System.out.println("total IDs: " + IDsAdded);
+
               Button saveSrc = new Button("Save this source");
               saveSrc.setFont(Font.font("Helvetica", 30));
               Button ext = new Button("Exit without saving");
               ext.setFont(Font.font("Helvetica", 30));
               saveExt.getChildren().add(saveSrc);
               saveExt.getChildren().add(ext);
-              
+
               if (!allData.containsKey(searchID)) {
                 Alert invalidID = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
                 invalidID.showAndWait().filter(response -> response == ButtonType.OK);
@@ -518,36 +545,68 @@ public class Main extends Application {
                 Label id_disp =
                     new Label("Displaying ID #" + searchID + ", " + types.get(searchID - 1));
                 id_disp.setFont(Font.font("Helvetica", 45));
-                Text right = new Text("Right Ascension: " + allData.get(searchID).getRA() + "°");
+                Text right;
+                if (allData.get(searchID).getRA() != -1.0) {
+                  right = new Text(params[1] + ": " + allData.get(searchID).getRA() + "°");
+                } else {
+                  right = new Text(params[1] + ": Parameter not given");
+
+                }
                 right.setFont(Font.font("Helvetica", 30));
                 vbox1.getChildren().add(id_disp);
                 vbox1.getChildren().add(right);
               }
               if (dec.isSelected()) {
-                Text decl = new Text("Declination: " + allData.get(searchID).getDEC() + "°");
+                Text decl;
+                if (allData.get(searchID).getDEC() != -1.0) {
+                  decl = new Text(params[2] + ": " + allData.get(searchID).getDEC() + "°");
+                } else {
+                  decl = new Text(params[2] + ": Parameter not given");
+                }
                 decl.setFont(Font.font("Helvetica", 30));
                 vbox1.getChildren().add(decl);
               }
               if (hflux.isSelected()) {
-                Text horiz = new Text(
-                    "Hard-Band Flux: " + allData.get(searchID).getHflux() + " cm^(-2) sec^(-1)");
+                Text horiz;
+                if (allData.get(searchID).getHflux() != -1.0) {
+                  horiz = new Text(
+                      params[3] + ": " + allData.get(searchID).getHflux() + " cm^(-2) sec^(-1)");
+                } else {
+                  horiz = new Text(params[3] + ": Parameter not given");
+                }
                 horiz.setFont(Font.font("Helvetica", 30));
                 vbox1.getChildren().add(horiz);
               }
               if (sflux.isSelected()) {
-                Text soft = new Text(
-                    "Soft-Band Flux: " + allData.get(searchID).getSflux() + " cm^(-2) sec^(-1)");
+                Text soft;
+                if (allData.get(searchID).getSflux() != -1.0) {
+                  soft = new Text(
+                      params[4] + ": " + allData.get(searchID).getSflux() + " cm^(-2) sec^(-1)");
+                } else {
+                  soft = new Text(params[4] + ": Parameter not given");
+                }
                 soft.setFont(Font.font("Helvetica", 30));
                 vbox1.getChildren().add(soft);
               }
               if (z.isSelected()) {
-                Text zee = new Text("Redshift: " + allData.get(searchID).getZ());
+                Text zee;
+                if (allData.get(searchID).getZ() != -1.0) {
+                  zee = new Text(params[5] + ": " + allData.get(searchID).getZ());
+                } else {
+                  zee = new Text(params[5] + ": Parameter not given");
+                }
                 zee.setFont(Font.font("Helvetica", 30));
                 vbox1.getChildren().add(zee);
               }
               if (rmag.isSelected()) {
-                Text mag = new Text("R-Band Magnitude: " + allData.get(searchID).getRmag());
+                Text mag;
+                if (allData.get(searchID).getRmag() != -1.0) {
+                  mag = new Text(params[6] + ": " + allData.get(searchID).getRmag());
+                } else {
+                  mag = new Text(params[6] + ": Parameter not given");
+                }
                 mag.setFont(Font.font("Helvetica", 30));
+
                 vbox1.getChildren().add(mag);
               }
               vbox1.getChildren().add(saveExt);
@@ -603,34 +662,49 @@ public class Main extends Application {
     pane.setBottom(botButtons);
   }
 
+  /*
+   * Method that creates the objects to be displayed at the top of screen 3
+   */
   private void inputTopPaneScreen3(BorderPane bp) {
-
+    // Create and set up a label to be placed at the top of screen 3
     Label top = new Label("Successfully written " + dataToWrite.size() + " IDs to a file");
     top.setFont((Font.font("Helvetica", FontWeight.BOLD, 36)));
     top.setTextFill(Color.WHITE);
 
-    bp.setTop(top);
+    bp.setTop(top); // add label to top of the border pane
   }
 
+  /*
+   * Method that writes the sources that are stored in the second global hash table to a separate
+   * file that will be given a valid name as a parameter
+   */
   private boolean writeToFile(String fileName) throws IOException {
+    // Set up the file to be written to
     File file = new File("./" + fileName);
     newFile = file;
-    JSONObject title = new JSONObject();
 
+    // creates the json object and array to be used
+    // to write to the new file
+    JSONObject title = new JSONObject();
     JSONArray allSources = new JSONArray();
+
     // Create the file
     if (!file.createNewFile()) {
       return false;
 
     }
 
-    System.out.println("writing file, size of hash is " + dataToWrite.size());
+    // loops through the second hash table to grab the
+    // data and transfer it to json data to be written
+    // to the new file created
     for (int i = 1; i <= dataToWrite.size(); i++) {
       SourceObject cur = dataToWrite.get(i);
       JSONArray paramArr = new JSONArray();
       // First Employee
       JSONObject id = new JSONObject();
 
+      // set up the json file to correct syntax
+      // add all relevant source parameters
       id.put("id", "" + cur.getID());
       JSONObject ra = new JSONObject();
       ra.put("ra", "" + cur.getRA());
@@ -645,6 +719,7 @@ public class Main extends Application {
       JSONObject rmag = new JSONObject();
       rmag.put("rmag", "" + cur.getRmag());
 
+      // add the parameter JSONObjects to the JSONArray
       paramArr.add(id);
       paramArr.add(ra);
       paramArr.add(dec);
@@ -652,26 +727,27 @@ public class Main extends Application {
       paramArr.add(sflux);
       paramArr.add(z);
       paramArr.add(rmag);
+      // create a new JSONObject to hold the source you're looking at
       JSONObject cursrc = new JSONObject();
+      // add the type JSONObject and source parameter array JSONArray
       cursrc.put("type:", types.get(i - 1));
       cursrc.put("parameterArray", paramArr);
-
+      // finally, add this source data to JSONOArray containing all sources
       allSources.add(cursrc);
-      // allSources.add(params);
-
     }
 
-
-    title.put("ModifiedAstronomicalData", allSources);
-    // Write JSON file
+    // set the title of the final JSONArray
+    title.put("AstronomicalData", allSources);
+    // create a new file
     try (FileWriter files = new FileWriter(fileName)) {
-
+      // write the JSONObjects into it
       files.write(title.toJSONString());
       files.flush();
-
+      // catch any unexpected exceptions
     } catch (IOException e) {
       e.printStackTrace();
     }
+    // return true, since file has been written
     return true;
   }
 
@@ -781,8 +857,19 @@ public class Main extends Application {
     }
   }
 
+  /**
+   * The main method initializes the data structure back ends, and several misc. fields, and then
+   * runs the GUI
+   * 
+   * @param args
+   * @throws FileNotFoundException
+   * @throws IOException
+   * @throws ParseException
+   * @throws org.json.simple.parser.ParseException
+   */
   public static void main(String[] args) throws FileNotFoundException, IOException, ParseException,
       org.json.simple.parser.ParseException {
+    // initialize fields
     allData = new Hashtable<Integer, SourceObject>();
     IDsAdded = 0;
     types = new ArrayList<String>();
@@ -790,7 +877,7 @@ public class Main extends Application {
     fileRead = false;
 
     System.out.println(System.getProperty("user.dir"));
-
+    // launch GUI
     launch(args);
   }
 
