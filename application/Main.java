@@ -415,13 +415,10 @@ public class Main extends Application {
 		HBox mainBox = new HBox(leftBox, rightBox);
 
 		bp.setLeft(mainBox);
-
-		// vbox.setBackground(new Background(new BackgroundFill(Color.WHITE,
-		// CornerRadii.EMPTY,
-		// Insets.EMPTY)));
 	}
 
 	private void inputRightPaneScreen2(BorderPane pane, Stage primaryStage) {
+		//Creates search field and label for parameter boxs
 		TextField enterID = new TextField();
 		enterID.setPromptText("Enter Valid ID");
 		Label label1 = new Label("Search ID: ");
@@ -434,6 +431,7 @@ public class Main extends Application {
 				new VBox(enterID, new Label(""), new Label("")));
 		hb.setAlignment(Pos.BOTTOM_RIGHT);
 
+		//checkboxes for all the paramters to be viewed
 		CheckBox ra = new CheckBox(params[1]);
 		ra.setTextFill(Color.WHITE);
 		ra.setFont(Font.font("Helvetica", 24));
@@ -453,10 +451,12 @@ public class Main extends Application {
 		rmag.setTextFill(Color.WHITE);
 		rmag.setFont(Font.font("Helvetica", 24));
 
+		//select all checkbox
 		CheckBox all = new CheckBox("Select All");
 		all.setTextFill(Color.WHITE);
 		all.setFont(Font.font("Helvetica", 24));
 
+		//organize checkboxes
 		VBox first = new VBox(ra, dec, hflux);
 		first.setSpacing(100);
 		VBox sec = new VBox(sflux, z, rmag);
@@ -464,6 +464,7 @@ public class Main extends Application {
 		HBox boxes = new HBox(first, sec);
 		boxes.setSpacing(30);
 
+		//vbox to contain all the boxes
 		VBox moreboxes = new VBox(hb, boxes, all);
 		moreboxes.setSpacing(100);
 		moreboxes.setTranslateX(-20);
@@ -475,6 +476,7 @@ public class Main extends Application {
 	}
 
 	private void inputBottomPaneScreen2(BorderPane pane, Stage primaryStage) {
+		//creates buttons for bottom of the screen
 		Button addSource = new Button("Add Source");
 		addSource.setFont(Font.font("Helvetica", 18));
 		Button display = new Button("Display/Save Source Data");
@@ -491,6 +493,7 @@ public class Main extends Application {
 		help.setFont(Font.font("Helvetica", 18));
 		HBox botRight = new HBox(write, enterFileName);
 		HBox botButtons = new HBox(help, addSource, display, botRight, average, exit);
+		//spaces buttons, then adds to pane
 		botButtons.setSpacing(50);
 		botButtons.setAlignment(Pos.CENTER);
 		botButtons.setTranslateY(-30);
@@ -499,7 +502,8 @@ public class Main extends Application {
 		display.setOnAction(e -> {
 			displayButtonAction(primaryStage, pane);
 		});
-
+		
+		//button to compute the mean distance from the source data
 		average.setOnAction(e -> {
 			String meanD = "" + getMeanDistance();
 			Alert meanDistance = new Alert(Alert.AlertType.INFORMATION, "Mean Source Distance: " + meanD.substring(0, 6)
@@ -507,6 +511,7 @@ public class Main extends Application {
 			meanDistance.showAndWait().filter(response -> response == ButtonType.OK);
 		});
 
+		//creates a popup containing helpful information to use the program
 		help.setOnAction(e -> {
 			Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
 					"How to operate the program:\nThere are many options that you have for going through the"
@@ -525,15 +530,15 @@ public class Main extends Application {
 			invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
 
 		});
-
+		//closes scene, moving to exit scene
 		exit.setOnAction(e -> {
 			primaryStage.setScene(scene4);
 		});
-
+		//calls method for creating add source popup
 		addSource.setOnAction(e -> {
 			popupAddScreen2(primaryStage);
 		});
-
+		//writes to a json file the information that was chose by user
 		write.setOnAction(e -> {
 			fileToWriteTo = enterFileName.getText().trim();
 			try {
@@ -691,6 +696,7 @@ public class Main extends Application {
 		popup.initModality(Modality.APPLICATION_MODAL);
 		popup.initOwner(primaryStage);
 
+		//create vbox for type box and parameters
 		VBox leftVbox = new VBox(20);
 		Label type = new Label("Select Type:");
 		type.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
@@ -711,7 +717,7 @@ public class Main extends Application {
 			leftVbox.getChildren().add(temp);
 		}
 		leftVbox.setTranslateX(10);
-
+		//creates vbox to hold other parameter text fields
 		VBox centerVbox = new VBox(20);
 		for (int i = params.length - 3; i < params.length; i++) {
 			VBox temp = new VBox(10);
@@ -727,7 +733,8 @@ public class Main extends Application {
 		centerVbox.setAlignment(Pos.BASELINE_CENTER);
 		centerVbox.setTranslateY(37);
 		centerVbox.setTranslateX(100);
-
+			
+		//hbox to contain the buttons to control the popup
 		HBox bottomHbox = new HBox(20);
 		Button addSource = new Button("Add Source");
 		addSource.setFont(Font.font("Helvetica", 20));
@@ -739,6 +746,7 @@ public class Main extends Application {
 		bottomHbox.setAlignment(Pos.BOTTOM_CENTER);
 		bottomHbox.setTranslateY(-10);
 
+		//whole scene border pane
 		BorderPane bp = new BorderPane();
 		bp.setLeft(leftVbox);
 		bp.setCenter(centerVbox);
@@ -747,6 +755,7 @@ public class Main extends Application {
 		popup.setScene(popupScene);
 		popup.show();
 
+		//adds the new source created with the given parameters
 		addSource.setOnAction(e -> {
 			String[][] pVals = new String[2][4];
 
@@ -773,6 +782,7 @@ public class Main extends Application {
 			}
 		});
 
+		//adds source but exits popup when its done
 		addAndExit.setOnAction(e -> {
 			String[][] pVals = new String[2][4];
 
@@ -806,6 +816,7 @@ public class Main extends Application {
 			}
 		});
 
+		//closes popup
 		exit.setOnAction(e -> {
 			popup.close();
 		});
