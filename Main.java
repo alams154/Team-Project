@@ -467,142 +467,157 @@ public class Main extends Application {
   }
 
   private void inputRightPaneScreen2(BorderPane pane, Stage primaryStage) {
-    TextField enterID = new TextField();
-    enterID.setPromptText("Enter Valid ID");
-    Label label1 = new Label("Search ID: ");
-    label1.setTextFill(Color.WHITE);
-    label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
-    Label labelParams = new Label("Select Parameters: ");
-    labelParams.setTextFill(Color.WHITE);
-    labelParams.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
-    HBox hb = new HBox(new VBox(label1, new Label(""), labelParams),
-        new VBox(enterID, new Label(""), new Label("")));
-    hb.setAlignment(Pos.BOTTOM_RIGHT);
+		//Creates search field and label for parameter boxs
+		TextField enterID = new TextField();
+		enterID.setPromptText("Enter Valid ID");
+		Label label1 = new Label("Search ID: ");
+		label1.setTextFill(Color.WHITE);
+		label1.setFont(Font.font("Helvetica", FontWeight.BOLD, 24));
+		Label labelParams = new Label("Select Parameters: ");
+		labelParams.setTextFill(Color.WHITE);
+		labelParams.setFont(Font.font("Helvetica", FontWeight.BOLD, 30));
+		HBox hb = new HBox(new VBox(label1, new Label(""), labelParams),
+				new VBox(enterID, new Label(""), new Label("")));
+		hb.setAlignment(Pos.BOTTOM_RIGHT);
 
-    CheckBox ra = new CheckBox(params[1]);
-    ra.setTextFill(Color.WHITE);
-    ra.setFont(Font.font("Helvetica", 24));
-    CheckBox dec = new CheckBox(params[2]);
-    dec.setTextFill(Color.WHITE);
-    dec.setFont(Font.font("Helvetica", 24));
-    CheckBox hflux = new CheckBox(params[3]);
-    hflux.setTextFill(Color.WHITE);
-    hflux.setFont(Font.font("Helvetica", 24));
-    CheckBox sflux = new CheckBox(params[4]);
-    sflux.setTextFill(Color.WHITE);
-    sflux.setFont(Font.font("Helvetica", 24));
-    CheckBox z = new CheckBox(params[5]);
-    z.setTextFill(Color.WHITE);
-    z.setFont(Font.font("Helvetica", 24));
-    CheckBox rmag = new CheckBox(params[6]);
-    rmag.setTextFill(Color.WHITE);
-    rmag.setFont(Font.font("Helvetica", 24));
+		//checkboxes for all the paramters to be viewed
+		CheckBox ra = new CheckBox(params[1]);
+		ra.setTextFill(Color.WHITE);
+		ra.setFont(Font.font("Helvetica", 24));
+		CheckBox dec = new CheckBox(params[2]);
+		dec.setTextFill(Color.WHITE);
+		dec.setFont(Font.font("Helvetica", 24));
+		CheckBox hflux = new CheckBox(params[3]);
+		hflux.setTextFill(Color.WHITE);
+		hflux.setFont(Font.font("Helvetica", 24));
+		CheckBox sflux = new CheckBox(params[4]);
+		sflux.setTextFill(Color.WHITE);
+		sflux.setFont(Font.font("Helvetica", 24));
+		CheckBox z = new CheckBox(params[5]);
+		z.setTextFill(Color.WHITE);
+		z.setFont(Font.font("Helvetica", 24));
+		CheckBox rmag = new CheckBox(params[6]);
+		rmag.setTextFill(Color.WHITE);
+		rmag.setFont(Font.font("Helvetica", 24));
 
-    CheckBox all = new CheckBox("Select All");
-    all.setTextFill(Color.WHITE);
-    all.setFont(Font.font("Helvetica", 24));
+		//select all checkbox
+		CheckBox all = new CheckBox("Select All");
+		all.setTextFill(Color.WHITE);
+		all.setFont(Font.font("Helvetica", 24));
 
-    VBox first = new VBox(ra, dec, hflux);
-    first.setSpacing(100);
-    VBox sec = new VBox(sflux, z, rmag);
-    sec.setSpacing(100);
-    HBox boxes = new HBox(first, sec);
-    boxes.setSpacing(30);
+		//organize checkboxes
+		VBox first = new VBox(ra, dec, hflux);
+		first.setSpacing(100);
+		VBox sec = new VBox(sflux, z, rmag);
+		sec.setSpacing(100);
+		HBox boxes = new HBox(first, sec);
+		boxes.setSpacing(30);
 
-    VBox moreboxes = new VBox(hb, boxes, all);
-    moreboxes.setSpacing(100);
-    moreboxes.setTranslateX(-20);
-    moreboxes.setTranslateY(10);
-    moreboxes.setAlignment(Pos.TOP_CENTER);
-    pane.setRight(moreboxes);
-    all.setOnAction(e -> checkall(ra, dec, hflux, sflux, z, rmag, all));
-    // bottom buttons
-  }
+		//vbox to contain all the boxes
+		VBox moreboxes = new VBox(hb, boxes, all);
+		moreboxes.setSpacing(100);
+		moreboxes.setTranslateX(-20);
+		moreboxes.setTranslateY(10);
+		moreboxes.setAlignment(Pos.TOP_CENTER);
+		pane.setRight(moreboxes);
+		all.setOnAction(e -> checkall(ra, dec, hflux, sflux, z, rmag, all));
+		// bottom buttons
+	}
 
   private void inputBottomPaneScreen2(BorderPane pane, Stage primaryStage) {
-    Button addSource = new Button("Add Source");
-    addSource.setFont(Font.font("Helvetica", 18));
-    Button display = new Button("Display/Save Source Data");
-    display.setFont(Font.font("Helvetica", 18));
-    Button write = new Button("Write");
-    write.setFont(Font.font("Helvetica", 18));
-    Button exit = new Button("Exit");
-    exit.setFont(Font.font("Helvetica", 18));
-    TextField enterFileName = new TextField();
-    enterFileName.setPromptText("Enter File Name");
-    Button average = new Button("Compute mean distance");
-    average.setFont(Font.font("Helvetica", 18));
-    Button help = new Button("Help");
-    help.setFont(Font.font("Helvetica", 18));
-    HBox botRight = new HBox(write, enterFileName);
-    HBox botButtons = new HBox(help, addSource, display, botRight, average, exit);
-    botButtons.setSpacing(50);
-    botButtons.setAlignment(Pos.CENTER);
-    botButtons.setTranslateY(-30);
-    pane.setBottom(botButtons);
+		//creates buttons for bottom of the screen
+		Button addSource = new Button("Add Source");
+		addSource.setFont(Font.font("Helvetica", 18));
+		Button display = new Button("Display/Save Source Data");
+		display.setFont(Font.font("Helvetica", 18));
+		Button write = new Button("Write");
+		write.setFont(Font.font("Helvetica", 18));
+		Button exit = new Button("Exit");
+		exit.setFont(Font.font("Helvetica", 18));
+		TextField enterFileName = new TextField();
+		enterFileName.setPromptText("Enter File Name");
+		Button average = new Button("Compute mean distance");
+		average.setFont(Font.font("Helvetica", 18));
+		Button help = new Button("Help");
+		help.setFont(Font.font("Helvetica", 18));
+		HBox botRight = new HBox(write, enterFileName);
+		HBox botButtons = new HBox(help, addSource, display, botRight, average, exit);
+		//spaces buttons, then adds to pane
+		botButtons.setSpacing(50);
+		botButtons.setAlignment(Pos.CENTER);
+		botButtons.setTranslateY(-30);
+		pane.setBottom(botButtons);
 
-    display.setOnAction(e -> {
-      displayButtonAction(primaryStage, pane);
-    });
+		display.setOnAction(e -> {
+			displayButtonAction(primaryStage, pane);
+		});
+		
+		//button to compute the mean distance from the source data
+		average.setOnAction(e -> {
+			String meanD = "" + getMeanDistance();
+			Alert meanDistance = new Alert(Alert.AlertType.INFORMATION, "Mean Source Distance: " + meanD.substring(0, 6)
+					+ meanD.substring(meanD.length() - 3, meanD.length()) + " cm");
+			meanDistance.showAndWait().filter(response -> response == ButtonType.OK);
+		});
 
-    average.setOnAction(e -> {
-      String meanD = "" + getMeanDistance();
-      Alert meanDistance = new Alert(Alert.AlertType.INFORMATION, "Mean Source Distance: "
-          + meanD.substring(0, 6) + meanD.substring(meanD.length() - 3, meanD.length()) + " cm");
-      meanDistance.showAndWait().filter(response -> response == ButtonType.OK);
-    });
+		//creates a popup containing helpful information to use the program
+		help.setOnAction(e -> {
+			Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
+					"How to operate the program:\nThere are many options that you have for going through the"
+							+ " data\nthat you read in from the file given. There are 3 analysis options"
+							+ " as well as an option to exit.\n\n To add a new source, click the add"
+							+ " button and add the preferred data\nto the popup window that appears.\n\n"
+							+ " To display data, check the correct data that is desired from the "
+							+ "checkboxes\non the right and then click on the display/save button. "
+							+ "A popup will appear, and\nif wanted, the data displayed can be saved to"
+							+ " be written to another json file by\nclicking on the save and exit"
+							+ " button.\n\n To write to another file, click on the write button, "
+							+ "and add a valid file name.\nInclude the .json at the end of the name "
+							+ "in order for the file to be created successfully. \nOnce clicked, all "
+							+ "sources (requested to save) from the second list will be written to a "
+							+ "separate json file saved to the current directory.");
+			invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
 
-    help.setOnAction(e -> {
-      Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
-          "How to operate the program:\nThere are many options that you have for going through the"
-              + " data that you read in from the file given. There are 3 analysis options"
-              + " as well as an option to exit.\n\n To add a new source, click the add"
-              + " button and add the preferred data\nto the popup window that appears.\n\n"
-              + " To display data, enter an ID and check the correct data that is desired from the "
-              + "checkboxes\non the right and then click on the display/save button. "
-              + "A popup will appear, and\nif wanted, the data displayed can be saved to"
-              + " be written to another json file by\nclicking on the save and exit"
-              + " button.\n\n To write to another file, click on the write button, "
-              + "and add a valid file name.\nInclude the .json at the end of the name "
-              + "in order for the file to be created successfully. \nOnce clicked, all "
-              + "sources (requested to save) from the second list will be written to a "
-              + "separate json file saved to the current directory.");
-      invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+		});
+		//closes scene, moving to exit scene
+		exit.setOnAction(e -> {
+			primaryStage.setScene(scene4);
+		});
+		//calls method for creating add source popup
+		addSource.setOnAction(e -> {
+			popupAddScreen2(primaryStage);
+		});
+		//writes to a json file the information that was chose by user
+		write.setOnAction(e -> {
+			fileToWriteTo = enterFileName.getText().trim();
+			try {
+				if (!writeToFile(fileToWriteTo) || !fileToWriteTo
+						.substring(fileToWriteTo.length() - 5, fileToWriteTo.length()).equals(".json")) {
+					Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
+							"Duplicate or invalid file, choose a .json file");
+					invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
+				} else {
+					scene3 = screen3Setup(primaryStage);
+					primaryStage.setScene(scene3);
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
-    });
+		});
 
-    exit.setOnAction(e -> {
-      primaryStage.setScene(scene4);
-    });
+	}
 
-    addSource.setOnAction(e -> {
-      popupAddScreen2(primaryStage);
-    });
-
-    write.setOnAction(e -> {
-      fileToWriteTo = enterFileName.getText().trim();
-      try {
-        if (!writeToFile(fileToWriteTo) || !fileToWriteTo
-            .substring(fileToWriteTo.length() - 5, fileToWriteTo.length()).equals(".json")) {
-          Alert invalidFile = new Alert(Alert.AlertType.INFORMATION,
-              "Duplicate or invalid file, choose a .json file");
-          invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
-        } else {
-          scene3 = screen3Setup(primaryStage);
-          primaryStage.setScene(scene3);
-        }
-      } catch (IOException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
-
-    });
-
-  }
-
-  private void displayButtonAction(Stage primaryStage, BorderPane pane) {
+  /*
+   * Method that creates a new window that is displayed with the data that corresponds
+   * to the ID typed into the ID search bar, and displays the selected data from
+   * the check boxes
+   */
+   private void displayButtonAction(Stage primaryStage, BorderPane pane) {
     if (fileRead) {
       try {
+		// create the popup for the display button
         final Stage disp = new Stage();
         TextField enterID =
             (TextField) ((VBox) ((HBox) ((VBox) pane.getRight()).getChildren().get(0)).getChildren()
@@ -621,26 +636,28 @@ public class Main extends Application {
             .getChildren().get(1)).getChildren().get(2);
 
         disp.initModality(Modality.APPLICATION_MODAL);
-
         disp.initOwner(primaryStage);
+		// create the boxes
         HBox saveExt = new HBox();
         VBox vbox1 = new VBox();
+		// add the data stored in the ID search and the subsequent
+		// data stored at that index in the hash table
         int searchID = Integer.parseInt(enterID.getText().trim());
-
         dataToWrite.put(IDsAdded + 1, allData.get(searchID));
         IDsAdded++;
-
+        // create the buttons and add them to the Hbox
         Button saveSrc = new Button("Save this source");
         saveSrc.setFont(Font.font("Helvetica", 30));
         Button ext = new Button("Exit without saving");
         ext.setFont(Font.font("Helvetica", 30));
         saveExt.getChildren().add(saveSrc);
         saveExt.getChildren().add(ext);
-
+        // send an alert if the hash table does not contain the ID found at the ID search
         if (!allData.containsKey(searchID)) {
           Alert invalidID = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
           invalidID.showAndWait().filter(response -> response == ButtonType.OK);
         }
+		// check the checkbox ra to see if it should be displayed in this popup
         if (ra.isSelected()) {
           Label id_disp = new Label("Displaying ID #" + searchID + ", " + types.get(searchID - 1));
           id_disp.setFont(Font.font("Helvetica", 45));
@@ -655,6 +672,8 @@ public class Main extends Application {
           vbox1.getChildren().add(id_disp);
           vbox1.getChildren().add(right);
         }
+		// check the checkbox dec to see if it should be displayed in this popup
+		// and add the text to the vbox of the popup
         if (dec.isSelected()) {
           Text decl;
           if (allData.get(searchID).getDEC() != -1.0) {
@@ -665,6 +684,8 @@ public class Main extends Application {
           decl.setFont(Font.font("Helvetica", 30));
           vbox1.getChildren().add(decl);
         }
+		// check the checkbox hflux to see if it should be displayed in this popup
+		// and add the text to the vbox of the popup
         if (hflux.isSelected()) {
           Text horiz;
           if (allData.get(searchID).getHflux() != -1.0) {
@@ -676,6 +697,8 @@ public class Main extends Application {
           horiz.setFont(Font.font("Helvetica", 30));
           vbox1.getChildren().add(horiz);
         }
+		// check the checkbox sflux to see if it should be displayed in this popup
+		// and add the text to the vbox of the popup
         if (sflux.isSelected()) {
           Text soft;
           if (allData.get(searchID).getSflux() != -1.0) {
@@ -687,6 +710,8 @@ public class Main extends Application {
           soft.setFont(Font.font("Helvetica", 30));
           vbox1.getChildren().add(soft);
         }
+		// check the checkbox z to see if it should be displayed in this popup
+		// and add the text to the vbox of the popup
         if (z.isSelected()) {
           Text zee;
           if (allData.get(searchID).getZ() != -1.0) {
@@ -697,6 +722,8 @@ public class Main extends Application {
           zee.setFont(Font.font("Helvetica", 30));
           vbox1.getChildren().add(zee);
         }
+		// check the checkbox rmag to see if it should be displayed in this popup
+		// and add the text to the vbox of the popup
         if (rmag.isSelected()) {
           Text mag;
           if (allData.get(searchID).getRmag() != -1.0) {
@@ -708,23 +735,30 @@ public class Main extends Application {
 
           vbox1.getChildren().add(mag);
         }
+		
+		// add the button hbox to the bottom of the vbox,
+		// and then set the scene
         vbox1.getChildren().add(saveExt);
         Scene dialogScene = new Scene(vbox1, 800, 500);
         disp.setScene(dialogScene);
         disp.setTitle("Display Source");
         // add a button for closing and a button for saving
         disp.show();
-
+        // if the save and exit button is clicked, close the screen
         saveSrc.setOnAction(f -> {
           scene2 = screen2Setup(primaryStage);
           primaryStage.setScene(scene2);
           disp.close();
         });
+		// if the exit button is clicked, clear the data that was written 
+		// to the second hash table and decrement the global IDsAdded
+		// and then close the screen
         ext.setOnAction(g -> {
           dataToWrite.remove(IDsAdded + 1);
           IDsAdded--;
           disp.close();
         });
+		// if there is an error, catch it and send an alert
       } catch (NumberFormatException f) {
         Alert invalidFile = new Alert(Alert.AlertType.INFORMATION, "ID not valid.");
         invalidFile.showAndWait().filter(response -> response == ButtonType.OK);
@@ -733,146 +767,162 @@ public class Main extends Application {
   }
 
   private void popupAddScreen2(Stage primaryStage) {
-    primaryStage.setTitle("Creating popup");
+		primaryStage.setTitle("Creating popup");
 
-    Stage popup = new Stage();
-    popup.initModality(Modality.APPLICATION_MODAL);
-    popup.initOwner(primaryStage);
+		Stage popup = new Stage();
+		popup.initModality(Modality.APPLICATION_MODAL);
+		popup.initOwner(primaryStage);
 
-    VBox leftVbox = new VBox(20);
-    Label type = new Label("Select Type:");
-    type.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
-    ObservableList<String> options =
-        FXCollections.observableArrayList(types.stream().distinct().collect(Collectors.toList()));
-    ComboBox<String> c = new ComboBox<String>(options);
-    VBox typeBox = new VBox(5);
-    typeBox.getChildren().addAll(type, c);
-    leftVbox.getChildren().add(typeBox);
-    for (int i = 1; i < params.length - 3; i++) {
-      VBox temp = new VBox(10);
-      TextField tf = new TextField();
-      tf.setPromptText(params[i]);
-      Label l = new Label(params[i] + ":");
-      l.setTextFill(Color.BLACK);
-      l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
-      temp.getChildren().addAll(l, tf);
-      leftVbox.getChildren().add(temp);
-    }
-    leftVbox.setTranslateX(10);
+		//create vbox for type box and parameters
+		VBox leftVbox = new VBox(20);
+		Label type = new Label("Select Type:");
+		type.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+		ObservableList<String> options = FXCollections
+				.observableArrayList(types.stream().distinct().collect(Collectors.toList()));
+		ComboBox<String> c = new ComboBox<String>(options);
+		VBox typeBox = new VBox(5);
+		typeBox.getChildren().addAll(type, c);
+		leftVbox.getChildren().add(typeBox);
+		for (int i = 1; i < params.length - 3; i++) {
+			VBox temp = new VBox(10);
+			TextField tf = new TextField();
+			tf.setPromptText(params[i]);
+			Label l = new Label(params[i] + ":");
+			l.setTextFill(Color.BLACK);
+			l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+			temp.getChildren().addAll(l, tf);
+			leftVbox.getChildren().add(temp);
+		}
+		leftVbox.setTranslateX(10);
+		//creates vbox to hold other parameter text fields
+		VBox centerVbox = new VBox(20);
+		for (int i = params.length - 3; i < params.length; i++) {
+			VBox temp = new VBox(10);
+			TextField tf = new TextField();
+			tf.setPromptText(params[i]);
+			tf.setMaxWidth(157);
+			Label l = new Label(params[i] + ":");
+			l.setTextFill(Color.BLACK);
+			l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
+			temp.getChildren().addAll(l, tf);
+			centerVbox.getChildren().add(temp);
+		}
+		centerVbox.setAlignment(Pos.BASELINE_CENTER);
+		centerVbox.setTranslateY(37);
+		centerVbox.setTranslateX(100);
+			
+		//hbox to contain the buttons to control the popup
+		HBox bottomHbox = new HBox(20);
+		Button addSource = new Button("Add Source");
+		addSource.setFont(Font.font("Helvetica", 20));
+		Button addAndExit = new Button("Add Source and Exit");
+		addAndExit.setFont(Font.font("Helvetica", 20));
+		Button exit = new Button("Exit");
+		exit.setFont(Font.font("Helvetica", 20));
+		bottomHbox.getChildren().addAll(addSource, addAndExit, exit);
+		bottomHbox.setAlignment(Pos.BOTTOM_CENTER);
+		bottomHbox.setTranslateY(-10);
 
-    VBox centerVbox = new VBox(20);
-    for (int i = params.length - 3; i < params.length; i++) {
-      VBox temp = new VBox(10);
-      TextField tf = new TextField();
-      tf.setPromptText(params[i]);
-      tf.setMaxWidth(157);
-      Label l = new Label(params[i] + ":");
-      l.setTextFill(Color.BLACK);
-      l.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
-      temp.getChildren().addAll(l, tf);
-      centerVbox.getChildren().add(temp);
-    }
-    centerVbox.setAlignment(Pos.BASELINE_CENTER);
-    centerVbox.setTranslateY(37);
-    centerVbox.setTranslateX(100);
+		//whole scene border pane
+		BorderPane bp = new BorderPane();
+		bp.setLeft(leftVbox);
+		bp.setCenter(centerVbox);
+		bp.setBottom(bottomHbox);
+		Scene popupScene = new Scene(bp, 600, 400);
+		popup.setScene(popupScene);
+		popup.show();
 
-    HBox bottomHbox = new HBox(20);
-    Button addSource = new Button("Add Source");
-    addSource.setFont(Font.font("Helvetica", 20));
-    Button addAndExit = new Button("Add Source and Exit");
-    addAndExit.setFont(Font.font("Helvetica", 20));
-    Button exit = new Button("Exit");
-    exit.setFont(Font.font("Helvetica", 20));
-    bottomHbox.getChildren().addAll(addSource, addAndExit, exit);
-    bottomHbox.setAlignment(Pos.BOTTOM_CENTER);
-    bottomHbox.setTranslateY(-10);
+		//adds the new source created with the given parameters
+		addSource.setOnAction(e -> {
+			String[][] pVals = new String[2][4];
 
-    BorderPane bp = new BorderPane();
-    bp.setLeft(leftVbox);
-    bp.setCenter(centerVbox);
-    bp.setBottom(bottomHbox);
-    Scene popupScene = new Scene(bp, 600, 400);
-    popup.setScene(popupScene);
-    popup.show();
+			pVals[0] = popupVboxIterator(leftVbox);
+			pVals[1] = popupVboxIterator(centerVbox);
 
-    addSource.setOnAction(e -> {
-      String[][] pVals = new String[2][4];
+			SourceObject s = null;
+			try {
+				s = popupSourceObject(pVals);
+				allData.put(types.size() + 1, s);
+				if (pVals[0][0].equals("null")) {
+					throw new NullPointerException();
+				}
+				types.add(pVals[0][0]);
+				scene2 = screen2Setup(primaryStage);
+				primaryStage.setScene(scene2);
+			} catch (NullPointerException np) {
+				allData.remove(types.size() + 1, s);
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+			} catch (NumberFormatException nf) {
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+			}
+		});
 
-      pVals[0] = popupVboxIterator(leftVbox);
-      pVals[1] = popupVboxIterator(centerVbox);
+		//adds source but exits popup when its done
+		addAndExit.setOnAction(e -> {
+			String[][] pVals = new String[2][4];
 
-      SourceObject s = null;
-      try {
-        s = popupSourceObject(pVals);
-        allData.put(types.size() + 1, s);
-        if (pVals[0][0].equals("null")) {
-          throw new NullPointerException();
-        }
-        types.add(pVals[0][0]);
-        scene2 = screen2Setup(primaryStage);
-        primaryStage.setScene(scene2);
-      } catch (NullPointerException np) {
-        allData.remove(types.size() + 1, s);
-        Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
-        invalid.showAndWait().filter(response -> response == ButtonType.OK);
-      } catch (NumberFormatException nf) {
-        Alert invalid =
-            new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
-        invalid.showAndWait().filter(response -> response == ButtonType.OK);
-      }
-    });
+			pVals[0] = popupVboxIterator(leftVbox);
+			pVals[1] = popupVboxIterator(centerVbox);
 
-    addAndExit.setOnAction(e -> {
-      String[][] pVals = new String[2][4];
+			boolean exception = false;
+			SourceObject s = null;
+			try {
+				s = popupSourceObject(pVals);
+				allData.put(types.size() + 1, s);
+				if (pVals[0][0].equals("null")) {
+					throw new NullPointerException();
+				}
+				types.add(pVals[0][0]);
+				scene2 = screen2Setup(primaryStage);
+				primaryStage.setScene(scene2);
+			} catch (NullPointerException np) {
+				allData.remove(types.size() + 1, s);
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+				exception = true;
+			} catch (NumberFormatException nf) {
+				Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
+				invalid.showAndWait().filter(response -> response == ButtonType.OK);
+				exception = true;
+			}
 
-      pVals[0] = popupVboxIterator(leftVbox);
-      pVals[1] = popupVboxIterator(centerVbox);
+			if (!exception) {
+				popup.close();
+			}
+		});
 
-      boolean exception = false;
-      SourceObject s = null;
-      try {
-        s = popupSourceObject(pVals);
-        allData.put(types.size() + 1, s);
-        if (pVals[0][0].equals("null")) {
-          throw new NullPointerException();
-        }
-        types.add(pVals[0][0]);
-        scene2 = screen2Setup(primaryStage);
-        primaryStage.setScene(scene2);
-      } catch (NullPointerException np) {
-        allData.remove(types.size() + 1, s);
-        Alert invalid = new Alert(Alert.AlertType.INFORMATION, "Please select a type");
-        invalid.showAndWait().filter(response -> response == ButtonType.OK);
-        exception = true;
-      } catch (NumberFormatException nf) {
-        Alert invalid =
-            new Alert(Alert.AlertType.INFORMATION, "Please enter a number in all fields");
-        invalid.showAndWait().filter(response -> response == ButtonType.OK);
-        exception = true;
-      }
+		//closes popup
+		exit.setOnAction(e -> {
+			popup.close();
+		});
 
-      if (!exception) {
-        popup.close();
-      }
-    });
+	}
 
-    exit.setOnAction(e -> {
-      popup.close();
-    });
-
-  }
-
-  private String[] popupVboxIterator(VBox top) {
-    String[] arr = new String[4];
+  /*
+   * Method that collects all the data added to the top box
+   * of the popup screen that adds a new source to the
+   * list of sources
+   */
+   private String[] popupVboxIterator(VBox top) {
+    // create an array that will hold the data to be returned
+	String[] arr = new String[4];
     int i = 1;
+	// loops through the checkbox and text fields to
+	// grab the text stored in these areas
     for (Node v : top.getChildren()) {
       if (v instanceof VBox) {
         VBox vb = (VBox) v;
         for (Node n : vb.getChildren()) {
           if (n instanceof ComboBox) {
+			  // if the combobox is detected, store the data
+			  // in the first index of the array
             ComboBox<String> cb = (ComboBox<String>) n;
             arr[0] = cb.getValue();
           } else if (n instanceof TextField) {
+			  // if its a text field, iterate through the
+			  // other indexes and store the data
             TextField t = (TextField) n;
             arr[i] = t.getText();
             i++;
@@ -883,14 +933,21 @@ public class Main extends Application {
     return arr;
   }
 
-  private SourceObject popupSourceObject(String[][] arr) throws NumberFormatException {
+  /*
+   * Method that parses a 2D string array into a 2D double array,
+   * and adds the values to a new source object
+   */
+   private SourceObject popupSourceObject(String[][] arr) throws NumberFormatException {
+	// create the new 2D double array and parse
+	// the values from the given array into it
     double[][] pVals = new double[2][4];
     for (int i = 0; i < arr.length; i++) {
       for (int j = 1; j < arr.length; j++) {
         pVals[i][j] = Double.parseDouble(arr[i][j]);
       }
-    }
-
+	}
+    
+	// create a new source object and add all the values from the new array to it
     SourceObject so = new SourceObject(types.size() + 1, pVals[0][1], pVals[0][2], pVals[0][3],
         pVals[1][1], pVals[1][2], pVals[1][3]);
 
